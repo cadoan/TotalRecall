@@ -21,24 +21,24 @@ module.exports = function (grunt) {
         },
         watch: {
             compass: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
-                tasks: ['compass:server', 'autoprefixer']
-            },
-            styles: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
-                tasks: ['copy:styles', 'autoprefixer']
-            },
-            livereload: {
-                options: {
-                    livereload: '<%= connect.options.livereload %>'
-                },
-                files: [
-                    '<%= yeoman.app %>/*.html',
-                    '.tmp/styles/{,*/}*.css',
-                    '{.tmp,<%= yeoman.app %>}/scripts/{,*/}*.js',
-                    '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
-                ]
-            }
+                files: ['<%= yeoman.app %>/sass/{,*/}*.{scss,sass}'],
+                tasks: ['compass:server']
+            }//,
+            // styles: {
+            //     files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
+            //     tasks: ['copy:styles', 'autoprefixer']
+            // },
+            // livereload: {
+            //     options: {
+            //         livereload: '<%= connect.options.livereload %>'
+            //     },
+            //     files: [
+            //         '<%= yeoman.app %>/*.html',
+            //         '.tmp/styles/{,*/}*.css',
+            //         '{.tmp,<%= yeoman.app %>}/scripts/{,*/}*.js',
+            //         '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+            //     ]
+            // }
         },
         connect: {
             options: {
@@ -85,29 +85,29 @@ module.exports = function (grunt) {
             },
             server: '.tmp'
         },
-        jshint: {
-            options: {
-                jshintrc: '.jshintrc'
-            },
-            all: [
-                'Gruntfile.js',
-                '<%= yeoman.app %>/scripts/{,*/}*.js',
-                '!<%= yeoman.app %>/scripts/vendor/*',
-                'test/spec/{,*/}*.js'
-            ]
-        },
-        mocha: {
-            all: {
-                options: {
-                    run: true,
-                    urls: ['http://<%= connect.test.options.hostname %>:<%= connect.test.options.port %>/index.html']
-                }
-            }
-        },
+        // jshint: {
+        //     options: {
+        //         jshintrc: '.jshintrc'
+        //     },
+        //     all: [
+        //         'Gruntfile.js',
+        //         '<%= yeoman.app %>/scripts/{,*/}*.js',
+        //         '!<%= yeoman.app %>/scripts/vendor/*',
+        //         'test/spec/{,*/}*.js'
+        //     ]
+        // },
+        // mocha: {
+        //     all: {
+        //         options: {
+        //             run: true,
+        //             urls: ['http://<%= connect.test.options.hostname %>:<%= connect.test.options.port %>/index.html']
+        //         }
+        //     }
+        // },
         compass: {
             options: {
-                sassDir: '<%= yeoman.app %>/styles',
-                cssDir: '.tmp/styles',
+                sassDir: '<%= yeoman.app %>/sass',
+                cssDir: '<%= yeoman.app %>/styles',
                 generatedImagesDir: '.tmp/images/generated',
                 imagesDir: '<%= yeoman.app %>/images',
                 javascriptsDir: '<%= yeoman.app %>/scripts',
@@ -130,19 +130,19 @@ module.exports = function (grunt) {
                 }
             }
         },
-        autoprefixer: {
-            options: {
-                browsers: ['last 1 version']
-            },
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '.tmp/styles/',
-                    src: '{,*/}*.css',
-                    dest: '.tmp/styles/'
-                }]
-            }
-        },
+        // autoprefixer: {
+        //     options: {
+        //         browsers: ['last 1 version']
+        //     },
+        //     dist: {
+        //         files: [{
+        //             expand: true,
+        //             cwd: '.tmp/styles/',
+        //             src: '{,*/}*.css',
+        //             dest: '.tmp/styles/'
+        //         }]
+        //     }
+        // },
         // not used since Uglify task does concat,
         // but still available if needed
         /*concat: {

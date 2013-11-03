@@ -1,0 +1,15 @@
+/* BEM mixins from http://blog.unakravets.com/post/64113156740/sass-3-3-at-root-bem */
+
+//elements get appended with "__" and the $name
+@mixin element($element) {
+  @at-root #{&}__#{$element} {
+    @content;
+  }
+}
+
+//modifiers get appended with "--" and the $name
+@mixin modifier($modifier) {
+  @at-root #{&}--#{$modifier} {
+    @content;
+  }
+}

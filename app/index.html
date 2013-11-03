@@ -21,23 +21,35 @@
         <!--[if lt IE 10]>
             <p class="browsehappy">Really, you choose to use an old IE?  Really??</p>
         <![endif]-->
+        <div class="intro-wrapper" id="intro-wrapper">
 
-        <div class="signin">
-            <form id="signinForm" novalidate>
-                <input type="text" name="name">
-                <input type="email" name="email">
-                <input type="submit" id="signin">
-            </form>
+            <div class="signin" id="signin">
+                <form id="signinForm" class="signin__form" novalidate>
+
+                    <h1 class="signin__form__title">Hi there!  Come play a game of Total Recall!</h1>
+
+                    <h2 class="signin__form__intro">Tells us your name and email, if you'd like to</h2>
+
+                    <input type="text" class="signin__form__text-input" name="name">
+                    <input type="email" class="signin__form__text-input" name="email">
+                    <input type="submit" class="signin__form__submit" id="signin">
+                </form>
+            </div>
+
+            <div class="wait" id="wait">
+                <h2 class="wait__message">Loading your totes amazing game now.  Any second now...</h2>
+                <img class="wait__animation" src="images/loader.gif">
+            </div>
         </div>
 
 
-        <div class="game" id="gameboard">
-
+        <div class="gameboard-wrapper" id="gameboard-wrapper">
+            <div class="gameboard" id="gameboard">
+            </div>
+            <button type="button" id="solve">Solve game</button>
         </div>
 
-        <button type="button" id="solve">Solve game</button>
-
-
+        
 
         <!-- build:js scripts/vendor.js -->
         <!-- bower:js -->

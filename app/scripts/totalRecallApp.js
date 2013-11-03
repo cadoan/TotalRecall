@@ -18,22 +18,15 @@ define(['jquery'], function ($) {
 		var secondCard = { id: null, $card: null, value: null};
 		var cardsLeft;
 
-
-		var autosolver;
 		var solverQueue;
 		var solverMemory={};
 		var solverMatchesList=[];
 
 
-		//Prepare game
+		// GAME SETUP
 		this.init = function(){
-
-			//Attach event handlers
 			$("#signin").on("click", handleSignin);
-			$("#gameboard").on("click", ".card", cardClicked);
-
-			$("#signin").click();
-
+			$("#gameboard").on("click", ".gameboard__row__card", cardClicked);
 			$("#solve").on("click", solveGame);
 		};
 
@@ -43,9 +36,12 @@ define(['jquery'], function ($) {
 		function handleSignin(event){
 			event.preventDefault();
 
-			var signinDetails = $("#signinForm").serialize();
-			console.log(signinDetails);
+			//Show wait spinner
+			$("#signin").hide();
+			$("#wait").css("display", "inline-block");
 
+
+			var signinDetails = $("#signinForm").serialize();
 			$.ajax({
 				url: URL,
 				type: "POST",
@@ -53,9 +49,6 @@ define(['jquery'], function ($) {
 				success: initGame,
 				error: handleAjaxError
 			});
-
-			//TODO: wait spinner
-
 		}
 
 
@@ -80,11 +73,11 @@ define(['jquery'], function ($) {
 			var cardID;
 			for(var y = 0; y < gameData.height; y++){
 
-				cardsHTML += "<div class='row'>";
+				cardsHTML += "<div class='gameboard__row'>";
 				
 				for(var x = 0; x < gameData.width; x++){
 					cardID = "card-" + x +"-" + y;
-					cardsHTML += "<div class='card inplay' id='" + cardID + "'></div>";
+					cardsHTML += "<div class='gameboard__row__card gameboard__row__card--inplay' id='" + cardID + "'></div>";
 					
 					//Save the card's coordinates so they dont have to be recomputed later
 					cardsData[cardID] = {coords:  {x: x, y: y}, value: null, matched: false, seen: false};
@@ -95,7 +88,9 @@ define(['jquery'], function ($) {
 			cardsLeft = gameData.height * gameData.width;
 
 			//Add to gameboard
+			$("#intro-wrapper").hide();
 			$("#gameboard").append(cardsHTML);
+			$("#gameboard-wrapper").show();
 		}
 
 
@@ -125,8 +120,8 @@ define(['jquery'], function ($) {
 
 			var $card = $(event.target);
 
-			//No clicks allowed on currently showing card, or already matched cards
-			if( $card.hasClass("showing") || $card.hasClass("matched")){
+			//No clicks allowed on currently showing cards or matched cards
+			if( $card.hasClass("gameboard__row__card--showing") || $card.hasClass("gameboard__row__card--matched")){
 				console.log('card already showing or matched');
 				return;
 			}
@@ -172,7 +167,7 @@ define(['jquery'], function ($) {
 			//Show new card
 			$card
 				.text(value)
-				.addClass("showing");
+				.addClass("gameboard__row__card--showing");
 
 
 			//Is first card of current pair of clicks
@@ -200,9 +195,8 @@ define(['jquery'], function ($) {
 			//Mismatch
 			if( firstCard.value !== secondCard.value){
 				
-				if(autosolver){
-					saveForSolver();
-				}
+				//Save card info for the auto-solver
+				saveForSolver();
 
 				setTimeout( hidePair, 0);
 			}
@@ -220,11 +214,11 @@ define(['jquery'], function ($) {
 			firstCard.$card
 				//.text("")
 				.removeClass("")
-				.removeClass("showing border");
+				.removeClass("gameboard__row__card--showing gameboard__row__card--border");
 
 			secondCard.$card
 				//.text("")
-				.removeClass("showing border");
+				.removeClass("gameboard__row__card--showing gameboard__row__card--border");
 
 
 			//reset pair
@@ -241,12 +235,12 @@ define(['jquery'], function ($) {
 
 			//Mark the cards as matched
 			firstCard.$card
-				.addClass("matched")
-				.removeClass("inplay");
+				.addClass("gameboard__row__card--matched")
+				.removeClass("gameboard__row__card--inplay");
 
 			secondCard.$card
-				.addClass("matched")
-				.removeClass("inplay");
+				.addClass("gameboard__row__card--matched")
+				.removeClass("gameboard__row__card--inplay");
 
 			cardsData[firstCard.id].matched = cardsData[secondCard.id].matched = true;
 
@@ -261,12 +255,11 @@ define(['jquery'], function ($) {
 			//More matches to be made
 			if(cardsLeft > 2){
 				allowGuess = true;
-				$("#gameboard").trigger("gameready");				
+				$("#gameboard").trigger("gameready");
 			}
 
 			//All pairs identified, game over
 			else{
-
 				allowGuess = true;  //TEMP: REMOVE IN LIVE
 				endGame();
 			}
@@ -277,7 +270,7 @@ define(['jquery'], function ($) {
 		function endGame(){
 
 			//Get last pair
-			var lastCards = $("#gameboard .inplay");
+			var lastCards = $("#gameboard .gameboard__row__card--inplay");
 			var value;
 
 			console.log("lastcards: ", lastCards);
@@ -286,6 +279,13 @@ define(['jquery'], function ($) {
 				console.log("error ending game. there are not exactly two cards left");
 				return;
 			}
+
+			//Get value if known
+			// value = cardsData[ lastCards[0].attr("id") ].value || cardsData[ lastCards[1].attr("id") ].value;
+
+			// if (!value){
+
+			// }
 
 			// //Show the last pair
 			// if( cardsData[].value ){
@@ -298,6 +298,10 @@ define(['jquery'], function ($) {
 
 			// showCard($card, value);
 			// showCard()
+
+			//lastCards[0].click();
+
+			//lastCards[1].click();
 
 			var cardData = cardsData[ $(lastCards[0]).attr("id") ];
 			var coordsString = "x1=" + cardData.coords.x + "&y1=" + cardData.coords.y;
@@ -318,9 +322,9 @@ define(['jquery'], function ($) {
 
 
 		function endGameResult(data){
-			console.log(data);
 
-			if (data.succces){
+			console.log("success: ", data.success);
+			if (data.success){
 				alert("you won!");
 			}
 			else{
@@ -344,7 +348,6 @@ define(['jquery'], function ($) {
 
 
 			if( cardsLeft > 2){
-				autosolver = true;
 
 				//Prep handlers for saving card data and picking next cards
 				$("#gameboard").on("gameready", pickNextCard);
@@ -453,7 +456,7 @@ define(['jquery'], function ($) {
 			}
 
 
-			$("#"+cardID).addClass("border");
+			$("#"+cardID).addClass("gameboard__row__card--border");
 			return cardID;
 		}
 			

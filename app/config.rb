@@ -1,0 +1,10 @@
+#preferred_syntax = :sass
+http_path = '/'
+css_dir = './styles'
+sass_dir = './sass'
+images_dir = './images'
+javascripts_dir = './scripts'
+relative_assets = true
+line_comments = true
+import_path = './bower_components'
+# output_style = :compressed
