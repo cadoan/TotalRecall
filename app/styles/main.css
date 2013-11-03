@@ -27,3 +27,35 @@ body {
     color: #000;
     padding: 0.2em 0;
 }
+
+.row{
+    margin-bottom: 10px;
+}
+.card{
+    display: inline-block;
+    vertical-align: top;
+    width: 100px;
+    height: 150px;
+    border-radius: 5px;
+    margin-right: 10px;    
+    border: 1px solid black;    
+    background: green;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 5px solid green;
+
+    font-size: 50px;
+    text-align: center;    
+}
+.card.showing{
+    background: white;
+    cursor: default;
+}
+.card.matched{
+    background: gray;
+    color: darkgray;
+    cursor: default;
+}
+.card.border{
+    border: 5px solid red;
+}

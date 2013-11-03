@@ -1,12 +1,12 @@
 require.config({
-    paths: {
+	paths: {
         jquery: '../bower_components/jquery/jquery'
     }
 });
 
-require(['app', 'jquery'], function (app, $) {
+require(['totalRecallApp'], function (totalRecallApp) {
     'use strict';
-    // use app here
-    console.log(app);
-    console.log('Running jQuery %s', $().jquery);
+   
+	totalRecallApp.init();
+   
 });
