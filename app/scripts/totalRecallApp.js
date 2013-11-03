@@ -1,7 +1,7 @@
 /*jshint -W109 */
 
 
-define(['jquery'], function ($) {
+define(['jquery', 'utilities'], function ($, Utilities) {
 	'use strict';
 
 
@@ -62,6 +62,9 @@ define(['jquery'], function ($) {
 
 		function initGame(gameData){
 			
+			var cardsHTML = "";
+			var cardID;
+			
 			checkGameData(gameData);
 
 			gameDetails = gameData;
@@ -69,15 +72,13 @@ define(['jquery'], function ($) {
 
 
 			//FILL GAME BOARD WITH CARDS
-			var cardsHTML = "";
-			var cardID;
 			for(var y = 0; y < gameData.height; y++){
 
 				cardsHTML += "<div class='gameboard__row'>";
 				
 				for(var x = 0; x < gameData.width; x++){
 					cardID = "card-" + x +"-" + y;
-					cardsHTML += "<div class='gameboard__row__card gameboard__row__card--inplay' id='" + cardID + "'></div>";
+					cardsHTML += "<div class='gameboard__row__card gameboard__row__card--inplay' id='" + cardID + "'><div class='gameboard__row__card__face gameboard__row__card__face--front'></div><div class='gameboard__row__card__face gameboard__row__card__face--back'></div></div>";
 					
 					//Save the card's coordinates so they dont have to be recomputed later
 					cardsData[cardID] = {coords:  {x: x, y: y}, value: null, matched: false, seen: false};
@@ -89,10 +90,40 @@ define(['jquery'], function ($) {
 
 			//Add to gameboard
 			$("#intro-wrapper").hide();
-			$("#gameboard").append(cardsHTML);
-			$("#gameboard-wrapper").show();
+			$("#gameboard").html(cardsHTML);
+			setGameboardSizes();
 		}
 
+
+		function setGameboardSizes(){
+
+			var margin, marginsWidth, marginsHeight;
+			var cardsWidth, cardWidth;
+			var cardsHeight, cardHeight;
+			var totalHeight = $(window).height();
+
+			$("#gameboard").css("height", "80%");
+
+			margin = 10; //$(".gameboard__row__card").css("margin-left").replace("px","");
+			marginsWidth = margin * (gameDetails.width - 1);
+			cardsWidth = $(".gameboard__row").width() - marginsWidth;
+			cardWidth = Math.floor( cardsWidth / gameDetails.width );
+			cardWidth -= 2; //for border
+
+			marginsHeight = margin * (gameDetails.height - 1);
+			cardsHeight = $(".gameboard").height() - marginsWidth;
+			cardHeight = Math.floor( cardsHeight / gameDetails.height );
+			cardHeight -= 2;
+
+			//Utilities.addStyle(".gameboard__row__card", "width:"+cardWidth+"px");	
+			$(".gameboard__row__card").each(function(){
+				$(this)
+					.width(cardWidth)
+					.height(cardHeight)
+					.find(".gameboard__row__card__face--front").css("line-height", cardHeight+"px");
+			});
+				
+		}
 
 
 
@@ -118,7 +149,7 @@ define(['jquery'], function ($) {
 			//Block further clicks while this card is handled
 			allowGuess = false;
 
-			var $card = $(event.target);
+			var $card = $(event.currentTarget);
 
 			//No clicks allowed on currently showing cards or matched cards
 			if( $card.hasClass("gameboard__row__card--showing") || $card.hasClass("gameboard__row__card--matched")){
@@ -130,28 +161,17 @@ define(['jquery'], function ($) {
 			var theCardData = cardsData[ $card.attr("id") ];
 			var targetURL = cardsURL + theCardData.coords.x + "," + theCardData.coords.y;
 
+			$.ajax({
+				url: targetURL,
+				type: "GET",
+				success: function(data){
 
-			// Use card's saved value if it exists
-			// if( theCardData.value ){
-			// 	showCard($card, theCardData.value);
-			// }
-
-			// else{
-				$.ajax({
-					url: targetURL,
-					type: "GET",
-					success: function(data){
-
-						//Save the value first
-						theCardData.value = data;
-						theCardData.seen = true;
-						//theCardData.$card = $card;
-
-						showCard( $card, data);
-					},
-					error: cardAjaxError
-				});
-			// }
+					theCardData.value = data; //Save the value first
+					theCardData.seen = true;
+					showCard( $card, data);
+				},
+				error: cardAjaxError
+			});
 		}
 
 
@@ -166,9 +186,9 @@ define(['jquery'], function ($) {
 
 			//Show new card
 			$card
-				.text(value)
-				.addClass("gameboard__row__card--showing");
-
+				.addClass("gameboard__row__card--showing gameboard__row__card--flipped")
+				.find(".gameboard__row__card__face--front").text(value);
+				
 
 			//Is first card of current pair of clicks
 			if(!firstCard.id){
@@ -198,12 +218,12 @@ define(['jquery'], function ($) {
 				//Save card info for the auto-solver
 				saveForSolver();
 
-				setTimeout( hidePair, 0);
+				setTimeout( hidePair, 1000);
 			}
 
 			//Match found
 			else{
-				setTimeout( pairMatched, 0);
+				setTimeout( pairMatched, 1000);
 			}
 		}
 			
@@ -214,11 +234,11 @@ define(['jquery'], function ($) {
 			firstCard.$card
 				//.text("")
 				.removeClass("")
-				.removeClass("gameboard__row__card--showing gameboard__row__card--border");
+				.removeClass("gameboard__row__card--showing gameboard__row__card--flipped");
 
 			secondCard.$card
 				//.text("")
-				.removeClass("gameboard__row__card--showing gameboard__row__card--border");
+				.removeClass("gameboard__row__card--showing gameboard__row__card--flipped");
 
 
 			//reset pair
@@ -235,12 +255,12 @@ define(['jquery'], function ($) {
 
 			//Mark the cards as matched
 			firstCard.$card
-				.addClass("gameboard__row__card--matched")
-				.removeClass("gameboard__row__card--inplay");
+				.removeClass("gameboard__row__card--inplay")
+				.find(".gameboard__row__card__face--front").addClass("gameboard__row__card__face--matched");
 
 			secondCard.$card
-				.addClass("gameboard__row__card--matched")
-				.removeClass("gameboard__row__card--inplay");
+				.removeClass("gameboard__row__card--inplay")
+				.find(".gameboard__row__card__face--front").addClass("gameboard__row__card__face--matched");
 
 			cardsData[firstCard.id].matched = cardsData[secondCard.id].matched = true;
 
@@ -255,7 +275,7 @@ define(['jquery'], function ($) {
 			//More matches to be made
 			if(cardsLeft > 2){
 				allowGuess = true;
-				$("#gameboard").trigger("gameready");
+				setTimeout(function(){$("#gameboard").trigger("gameready")}, 200);
 			}
 
 			//All pairs identified, game over
@@ -281,27 +301,14 @@ define(['jquery'], function ($) {
 			}
 
 			//Get value if known
-			// value = cardsData[ lastCards[0].attr("id") ].value || cardsData[ lastCards[1].attr("id") ].value;
+			//value = cardsData[ lastCards[0].attr("id") ].value || cardsData[ lastCards[1].attr("id") ].value;
 
-			// if (!value){
+			//if (!value){
+				// cardClicked( {currentTarget: "#"+lastCards[0].id} );
+				// cardClicked( {currentTarget: "#"+lastCards[1].id} );
+			//}
+			//else
 
-			// }
-
-			// //Show the last pair
-			// if( cardsData[].value ){
-			// 	value = cardsData[].value
-			// }
-
-			// else if( cardsData[].value ){
-			// 	value = car
-			// }
-
-			// showCard($card, value);
-			// showCard()
-
-			//lastCards[0].click();
-
-			//lastCards[1].click();
 
 			var cardData = cardsData[ $(lastCards[0]).attr("id") ];
 			var coordsString = "x1=" + cardData.coords.x + "&y1=" + cardData.coords.y;
@@ -456,7 +463,7 @@ define(['jquery'], function ($) {
 			}
 
 
-			$("#"+cardID).addClass("gameboard__row__card--border");
+			$("#"+cardID).addClass("");
 			return cardID;
 		}
 			

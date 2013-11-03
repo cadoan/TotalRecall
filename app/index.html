@@ -21,6 +21,11 @@
         <!--[if lt IE 10]>
             <p class="browsehappy">Really, you choose to use an old IE?  Really??</p>
         <![endif]-->
+
+        <header>
+            TOTAL RECALL GAME
+        </header>
+
         <div class="intro-wrapper" id="intro-wrapper">
 
             <div class="signin" id="signin">
@@ -43,13 +48,20 @@
         </div>
 
 
-        <div class="gameboard-wrapper" id="gameboard-wrapper">
-            <div class="gameboard" id="gameboard">
+
+        <div class="gameboard" id="gameboard">
+            <div class="gameboard__row">
+                <div class="gameboard__row__card">
+                    <div class="gameboard__row__card__face gameboard__row__card__face--front"></div>
+                    <div class="gameboard__row__card__face gameboard__row__card__face--back"></div>
+                </div>
             </div>
-            <button type="button" id="solve">Solve game</button>
         </div>
 
         
+        <footer>
+            <button type="button" id="solve">Solve game</button>
+        </footer>
 
         <!-- build:js scripts/vendor.js -->
         <!-- bower:js -->
