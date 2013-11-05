@@ -1,162 +1,349 @@
+/* NOTES:
+ *   - This sass sheet uses BEM mixins 
+ */
+
+
 $minwidth: 600px;
 $maxwidth: 960px;
+$feature-font: "Lobster Two", sans-serif;
+$title-font: "Cabin", sans-serif;
+$feature-color: #660000;
 
 html{
 	height: 100%;
 }
 body {
 	height: 100%;
-	background: url(../images/felt.jpg) repeat;  
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	color: #333;
+	background: url(../images/felt.jpg) repeat;
  	font-size: 12px;
+ 	font-family: $title-font;
+}
+h2{
+	font-family: $title-font;
+	font-size: 1.5rem;
+	color: #999;
+	margin-bottom: 1rem;
+}
+a{
+	color: white;
+	text-decoration: none;
+}
+em{
+	font-style: italic;
 }
 
-header{
+//BLOCK
+.header{
+	display: table;
+	width: 100%;
 	height: 10%;
-
 	font-size: 2rem;
 	color: white;
-	background: gray;
-}
+	background: $feature-color;
+	box-shadow: 0px 3px 3px rgba(0,0,0, 1);
 
-footer{
-	height: 10%;
-	background: grey;
-}
-
-.intro-wrapper{
-	height: 80%;
-	text-align: center;
-
-	&:before{
-		content: '';
-		display: inline-block;
-		height: 100%;
+	@include element(title){
+		display: table-cell;
 		vertical-align: middle;
+		font-family: $feature-font;
+		font-size: 5rem;
+		font-style: italic;
+		text-align: center;
+		text-shadow: 2px 3px 2px rgba(0, 0, 0, .5);
 	}
 }
 
-.signin{
-	display: inline-block;
-	vertical-align: middle;	
-	min-width: $minwidth;
-	max-width: $maxwidth;
-	margin: 0 auto;
-
-	background: #660000;
-	text-align: center;
-
-	border-radius: 10px;
-	@include box-shadow(0px 0px 20px rgba(0,0,0,.5));
-
-	@include element(form){
-		
-		@include element(title){
-			font-size: 2rem;
-			color: white;
-		}
-		@include element(intro){
-			font-size: 1.5rem;
-			color: gray;
-		}
-	}
-}
-
-
-.wait{
-	display: none;
-	vertical-align: middle;	
-	text-align: center;
+.messagebar{
+	display: table;
+	height: 3.5%;
+	min-height: 1rem;
+	width: 100%;
+	background: #666;
+	box-shadow: 0px 3px 3px rgba(0,0,0, .5);	
 
 	@include element(message){
-
+		display: table-cell;
+		vertical-align: middle;
+		color: white;
+		text-align: center;
 	}
 }
 
 
+//BLOCK
+.middle{
+	display: table;
+	width: 100%;
+	height: 80%;
+	position: relative;
+}
+
+//BLOCK
+.dialogbox{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	overflow: hidden;
+	z-index: 1;
+
+	text-align: center;
+	min-width: $minwidth;
+	max-width: $maxwidth;
+	max-height: 12rem;
+
+	border-radius: 10px;
+	border: 1px solid #333;
+
+	@include box-shadow(0px 0px 20px rgba(0,0,0,.5));
+
+	@include modifier(whiteshadow){
+		@include box-shadow(0px 0px 30px rgba(255,255,255,.4));
+	}
+
+	> div, form{
+		box-sizing: border-box;
+		height: 100%;
+		padding: 20px 30px;
+		text-align: center;
+	}
+}
+
+
+//BLOCK
+.signin{	
+	background: $feature-color;
+		
+	@include element(title){
+		margin-bottom: 1rem;
+		font-family: $feature-font;
+		font-size: 2.5rem;
+		text-shadow: 2px 3px 2px rgba(0, 0, 0, .5);
+		color: white;
+
+		em{
+			font-size: 3rem;
+		}
+	}
+	@include element(intro){
+
+		margin-bottom: 1rem;
+	}
+	@include element(text-input){
+		vertical-align: top;
+		height: 20px;
+		padding: 10px;
+		color: #333;
+		font-size: 20px;
+		border-radius: 5px;
+		border: 1px solid #333;
+	}
+	@include element(submit){
+		box-sizing: border-box;
+		vertical-align: top;
+		height: 40px;
+		color: white;
+		background: #060;
+		font-size: 20px;
+		line-height: 40px;
+		border-radius: 5px;
+		border: 1px solid #333;
+		cursor: pointer;
+
+		&:hover{
+			background: #030;
+		}
+	}
+}
+
+
+//BLOCK
+.wait{
+	display: none;
+	background: white;
+	position: absolute;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;	
+
+	@include element(message){
+		margin: 20px 0;
+	}
+}
+
+
+.endgame{
+	display: none;
+	background: $feature-color;
+	position: absolute;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;	
+
+	@include element(message){
+		margin: 20px 0;
+		color: white;
+		font-family: $feature-font;
+		font-size: 3.5rem;
+
+		em{
+			color: yellow;
+		}
+	}
+
+	@include element(submit){
+		box-sizing: border-box;
+		vertical-align: top;
+		height: 40px;
+		padding: 0 40px;
+		color: white;
+		background: #060;
+		font-size: 20px;
+		line-height: 40px;
+		border-radius: 5px;
+		border: 1px solid #333;
+		cursor: pointer;
+
+		&:hover{
+			background: #030;
+		}		
+	}	
+}
+
+//BLOCK
 .gameboard{
-	//display: none;
+	display: table-cell;
+	vertical-align: middle;
 	height: 0;
-	//overflow: hidden;
 	max-width: 700px;
 	min-width: 500px;
 	margin: 0 auto;
+	padding: 20px 0;
 	text-align:center;
-	//border: 1px solid red;
-
-	@include element(row){
-		margin-bottom: 10px;
-
-		@include element(card){
-			box-sizing: border-box;
-			display: inline-block;
-			vertical-align: top;
-			
-			max-width: 200px;
-			max-height: 200px;
-			margin-left: 10px;   
-			&:first-child{ margin-left: 0 } 
-			
-			box-shadow: 3px 3px 5px rgba(0,0,0,.5);
-			cursor: pointer;
-
-			//FOR 3D FLIIPPING//
-			position: relative;
-			@include perspective(600px);
-			@include transform-style(preserve-3d);
-			@include transition-property(transform);
-			@include transition-duration(.5s);
-			
-
-			@include modifier(flipped){
-				@include transform (rotateY(180deg));
-			}
-			//..//
-
-			@include modifier(showing){
-				//background: white;
-				cursor: default;
-			}
+}
 
 
-			@include modifier(border){
-				border-color: red;
-			}
+//BLOCK: Row - aggregated by gameboard
+.row{
+	margin-bottom: 10px;
+}
 
 
-			@include element(face){
-				@include backface-visibility(hidden);
-				@include border-radius(10px);				
-				display: block;
-				width: 100%;
-				height: 100%;
-				position: absolute;
-				overflow: hidden;
-				border: 1px solid #333;
+//BLOCK: Card - aggregated by rows
+.card{
+	position: relative;
+	box-sizing: border-box;
+	display: inline-block;
+	vertical-align: top;
+	
+	max-width: 130px;
+	max-height: 200px;
+	margin-left: 10px;   
+	&:first-child{ margin-left: 0 } 
+	
+	box-shadow: 3px 3px 5px rgba(0,0,0,.5);
+	cursor: pointer;
+
+	@include perspective(600px);
+	@include transform-style(preserve-3d);
+	@include transition-property(transform);
+	@include transition-duration(500ms);
+	
+	@include modifier(flipped){
+		@include transform (rotateY(180deg));
+	}
+
+	@include modifier(showing){
+		cursor: default;
+	}
 
 
-				@include modifier(back){
-					background: url(../images/logo.png) center center no-repeat white;
-					background-size: contain; 
-				}
-				@include modifier(front){
-					background: white;
-					font-weight: bold;		
-					text-transform: uppercase;			
-					font-size: 50px;
-					text-align: center;	
-					color: black;
-					@include transform (rotateY(180deg));
-				}
+	@include modifier(matched){
 
-				@include modifier(matched){
-					cursor: default;
-					background: pink;	
-				}
-			}
+		@include element(face){
+			cursor: default;
+			background: pink;				
+		}
+
+	}
+
+	@include element(face){
+		@include backface-visibility(hidden);
+		@include border-radius(10px);				
+		display: block;
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		overflow: hidden;
+		border: 1px solid #333;
 
 
+		@include modifier(back){
+			background: url(../images/logo.png) center center no-repeat white;
+			background-size: contain; 
+		}
+		@include modifier(front){
+			background: white;
+			font-weight: bold;		
+			text-transform: uppercase;			
+			font-size: 50px;
+			text-align: center;	
+			color: black;
+			@include transform (rotateY(180deg));
+		}
+
+		// @include modifier(matched){
+		// 	cursor: default;
+		// 	background: pink;	
+		// }
+	}
+
+}
+
+
+
+//BLOCK
+.footer{
+	display: table;
+	width: 100%;
+	height: 6.5%;
+	font-size: 2rem;
+	color: white;
+	background: $feature-color;
+	box-shadow: 0px -3px 3px rgba(0,0,0, .4);
+
+	@include element(title){
+		display: table-cell;
+		opacity: 0;
+		vertical-align: middle;
+		font-family: $feature-font;
+		font-size: 3rem;
+		text-align: center;
+		line-height: 100%;
+		text-shadow: 2px 3px 2px rgba(0, 0, 0, .5);
+		@include transition-property(opacity);
+		@include transition-duration(1s);
+
+		@include modifier(show){
+			opacity: 1;
 		}
 	}
+	@include element(link){
+		color: yellow;
+		font-style: italic;
+		&:hover{ color: red;}
+	}
+}
+
+
+.border{
+	border: 1px solid red !important;
 }

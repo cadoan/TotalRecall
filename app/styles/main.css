@@ -60,102 +60,256 @@ table {
 }
 
 /* BEM mixins from http://blog.unakravets.com/post/64113156740/sass-3-3-at-root-bem */
-/* line 4, ../sass/_totalrecall.scss */
+/* NOTES:
+ *   - This sass sheet uses BEM mixins 
+ */
+/* line 12, ../sass/_totalrecall.scss */
 html {
   height: 100%;
 }
 
-/* line 7, ../sass/_totalrecall.scss */
+/* line 15, ../sass/_totalrecall.scss */
 body {
   height: 100%;
   background: url(../images/felt.jpg) repeat;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #333;
   font-size: 12px;
+  font-family: "Cabin", sans-serif;
 }
 
-/* line 15, ../sass/_totalrecall.scss */
-header {
+/* line 21, ../sass/_totalrecall.scss */
+h2 {
+  font-family: "Cabin", sans-serif;
+  font-size: 1.5rem;
+  color: #999;
+  margin-bottom: 1rem;
+}
+
+/* line 27, ../sass/_totalrecall.scss */
+a {
+  color: white;
+  text-decoration: none;
+}
+
+/* line 31, ../sass/_totalrecall.scss */
+em {
+  font-style: italic;
+}
+
+/* line 36, ../sass/_totalrecall.scss */
+.header {
+  display: table;
+  width: 100%;
   height: 10%;
   font-size: 2rem;
   color: white;
-  background: gray;
+  background: #660000;
+  box-shadow: 0px 3px 3px black;
+}
+/* line 5, ../sass/_bem.scss */
+.header__title {
+  display: table-cell;
+  vertical-align: middle;
+  font-family: "Lobster Two", sans-serif;
+  font-size: 5rem;
+  font-style: italic;
+  text-align: center;
+  text-shadow: 2px 3px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* line 23, ../sass/_totalrecall.scss */
-footer {
-  height: 10%;
-  background: grey;
+/* line 56, ../sass/_totalrecall.scss */
+.messagebar {
+  display: table;
+  height: 3.5%;
+  min-height: 1rem;
+  width: 100%;
+  background: #666;
+  box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.5);
 }
-
-/* line 28, ../sass/_totalrecall.scss */
-.intro-wrapper {
-  height: 80%;
+/* line 5, ../sass/_bem.scss */
+.messagebar__message {
+  display: table-cell;
+  vertical-align: middle;
+  color: white;
   text-align: center;
 }
-/* line 32, ../sass/_totalrecall.scss */
-.intro-wrapper:before {
-  content: '';
-  display: inline-block;
-  height: 100%;
-  vertical-align: middle;
+
+/* line 74, ../sass/_totalrecall.scss */
+.middle {
+  display: table;
+  width: 100%;
+  height: 80%;
+  position: relative;
 }
 
-/* line 40, ../sass/_totalrecall.scss */
-.signin {
-  display: inline-block;
-  vertical-align: middle;
+/* line 82, ../sass/_totalrecall.scss */
+.dialogbox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  overflow: hidden;
+  z-index: 1;
+  text-align: center;
   min-width: 600px;
   max-width: 960px;
-  margin: 0 auto;
-  background: #660000;
-  text-align: center;
+  max-height: 12rem;
   border-radius: 10px;
+  border: 1px solid #333;
   -moz-box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
 }
-/* line 5, ../sass/_bem.scss */
-.signin__form__title {
-  font-size: 2rem;
-  color: white;
+/* line 12, ../sass/_bem.scss */
+.dialogbox--whiteshadow {
+  -moz-box-shadow: 0px 0px 30px rgba(255, 255, 255, 0.4);
+  -webkit-box-shadow: 0px 0px 30px rgba(255, 255, 255, 0.4);
+  box-shadow: 0px 0px 30px rgba(255, 255, 255, 0.4);
 }
-/* line 5, ../sass/_bem.scss */
-.signin__form__intro {
-  font-size: 1.5rem;
-  color: gray;
-}
-
-/* line 67, ../sass/_totalrecall.scss */
-.wait {
-  display: none;
-  vertical-align: middle;
+/* line 106, ../sass/_totalrecall.scss */
+.dialogbox > div, .dialogbox form {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 20px 30px;
   text-align: center;
 }
 
-/* line 78, ../sass/_totalrecall.scss */
+/* line 116, ../sass/_totalrecall.scss */
+.signin {
+  background: #660000;
+}
+/* line 5, ../sass/_bem.scss */
+.signin__title {
+  margin-bottom: 1rem;
+  font-family: "Lobster Two", sans-serif;
+  font-size: 2.5rem;
+  text-shadow: 2px 3px 2px rgba(0, 0, 0, 0.5);
+  color: white;
+}
+/* line 126, ../sass/_totalrecall.scss */
+.signin__title em {
+  font-size: 3rem;
+}
+/* line 5, ../sass/_bem.scss */
+.signin__intro {
+  margin-bottom: 1rem;
+}
+/* line 5, ../sass/_bem.scss */
+.signin__text-input {
+  vertical-align: top;
+  height: 20px;
+  padding: 10px;
+  color: #333;
+  font-size: 20px;
+  border-radius: 5px;
+  border: 1px solid #333;
+}
+/* line 5, ../sass/_bem.scss */
+.signin__submit {
+  box-sizing: border-box;
+  vertical-align: top;
+  height: 40px;
+  color: white;
+  background: #060;
+  font-size: 20px;
+  line-height: 40px;
+  border-radius: 5px;
+  border: 1px solid #333;
+  cursor: pointer;
+}
+/* line 155, ../sass/_totalrecall.scss */
+.signin__submit:hover {
+  background: #030;
+}
+
+/* line 163, ../sass/_totalrecall.scss */
+.wait {
+  display: none;
+  background: white;
+  position: absolute;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* line 5, ../sass/_bem.scss */
+.wait__message {
+  margin: 20px 0;
+}
+
+/* line 180, ../sass/_totalrecall.scss */
+.endgame {
+  display: none;
+  background: #660000;
+  position: absolute;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* line 5, ../sass/_bem.scss */
+.endgame__message {
+  margin: 20px 0;
+  color: white;
+  font-family: "Lobster Two", sans-serif;
+  font-size: 3.5rem;
+}
+/* line 197, ../sass/_totalrecall.scss */
+.endgame__message em {
+  color: yellow;
+}
+/* line 5, ../sass/_bem.scss */
+.endgame__submit {
+  box-sizing: border-box;
+  vertical-align: top;
+  height: 40px;
+  padding: 0 40px;
+  color: white;
+  background: #060;
+  font-size: 20px;
+  line-height: 40px;
+  border-radius: 5px;
+  border: 1px solid #333;
+  cursor: pointer;
+}
+/* line 215, ../sass/_totalrecall.scss */
+.endgame__submit:hover {
+  background: #030;
+}
+
+/* line 222, ../sass/_totalrecall.scss */
 .gameboard {
+  display: table-cell;
+  vertical-align: middle;
   height: 0;
   max-width: 700px;
   min-width: 500px;
   margin: 0 auto;
+  padding: 20px 0;
   text-align: center;
 }
-/* line 5, ../sass/_bem.scss */
-.gameboard__row {
+
+/* line 235, ../sass/_totalrecall.scss */
+.row {
   margin-bottom: 10px;
 }
-/* line 5, ../sass/_bem.scss */
-.gameboard__row__card {
+
+/* line 241, ../sass/_totalrecall.scss */
+.card {
+  position: relative;
   box-sizing: border-box;
   display: inline-block;
   vertical-align: top;
-  max-width: 200px;
+  max-width: 130px;
   max-height: 200px;
   margin-left: 10px;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
   cursor: pointer;
-  position: relative;
   -moz-perspective: 600px;
   -webkit-perspective: 600px;
   perspective: 600px;
@@ -166,17 +320,17 @@ footer {
   -o-transition-property: -o-transform;
   -webkit-transition-property: -webkit-transform;
   transition-property: transform;
-  -moz-transition-duration: 0.5s;
-  -o-transition-duration: 0.5s;
-  -webkit-transition-duration: 0.5s;
-  transition-duration: 0.5s;
+  -moz-transition-duration: 500ms;
+  -o-transition-duration: 500ms;
+  -webkit-transition-duration: 500ms;
+  transition-duration: 500ms;
 }
-/* line 99, ../sass/_totalrecall.scss */
-.gameboard__row__card:first-child {
+/* line 250, ../sass/_totalrecall.scss */
+.card:first-child {
   margin-left: 0;
 }
 /* line 12, ../sass/_bem.scss */
-.gameboard__row__card--flipped {
+.card--flipped {
   -moz-transform: rotateY(180deg);
   -ms-transform: rotateY(180deg);
   -o-transform: rotateY(180deg);
@@ -184,15 +338,16 @@ footer {
   transform: rotateY(180deg);
 }
 /* line 12, ../sass/_bem.scss */
-.gameboard__row__card--showing {
+.card--showing {
   cursor: default;
 }
-/* line 12, ../sass/_bem.scss */
-.gameboard__row__card--border {
-  border-color: red;
+/* line 5, ../sass/_bem.scss */
+.card--matched__face {
+  cursor: default;
+  background: pink;
 }
 /* line 5, ../sass/_bem.scss */
-.gameboard__row__card__face {
+.card__face {
   -moz-backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -207,12 +362,12 @@ footer {
   border: 1px solid #333;
 }
 /* line 12, ../sass/_bem.scss */
-.gameboard__row__card__face--back {
+.card__face--back {
   background: url(../images/logo.png) center center no-repeat white;
   background-size: contain;
 }
 /* line 12, ../sass/_bem.scss */
-.gameboard__row__card__face--front {
+.card__face--front {
   background: white;
   font-weight: bold;
   text-transform: uppercase;
@@ -225,8 +380,51 @@ footer {
   -webkit-transform: rotateY(180deg);
   transform: rotateY(180deg);
 }
+
+/* line 314, ../sass/_totalrecall.scss */
+.footer {
+  display: table;
+  width: 100%;
+  height: 6.5%;
+  font-size: 2rem;
+  color: white;
+  background: #660000;
+  box-shadow: 0px -3px 3px rgba(0, 0, 0, 0.4);
+}
+/* line 5, ../sass/_bem.scss */
+.footer__title {
+  display: table-cell;
+  opacity: 0;
+  vertical-align: middle;
+  font-family: "Lobster Two", sans-serif;
+  font-size: 3rem;
+  text-align: center;
+  line-height: 100%;
+  text-shadow: 2px 3px 2px rgba(0, 0, 0, 0.5);
+  -moz-transition-property: opacity;
+  -o-transition-property: opacity;
+  -webkit-transition-property: opacity;
+  transition-property: opacity;
+  -moz-transition-duration: 1s;
+  -o-transition-duration: 1s;
+  -webkit-transition-duration: 1s;
+  transition-duration: 1s;
+}
 /* line 12, ../sass/_bem.scss */
-.gameboard__row__card__face--matched {
-  cursor: default;
-  background: pink;
+.footer__title--show {
+  opacity: 1;
+}
+/* line 5, ../sass/_bem.scss */
+.footer__link {
+  color: yellow;
+  font-style: italic;
+}
+/* line 342, ../sass/_totalrecall.scss */
+.footer__link:hover {
+  color: red;
+}
+
+/* line 347, ../sass/_totalrecall.scss */
+.border {
+  border: 1px solid red !important;
 }

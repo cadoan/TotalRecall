@@ -1,15 +1,20 @@
 /*jshint -W109 */
-
-
 define(['jquery', 'utilities'], function ($, Utilities) {
 	'use strict';
 
 
+/* FOR PRODUCTION:  Override of console.log
+***************************************************************/
+	// var console = {};
+	// console.log = function(){};
+/**************************************************************/
 
-	//TOTAL RECALL GAME CLASS
-	function TotalRecallGame(){
 
-		var URL = "http://totalrecall.99cluster.com/games/";
+/* CLASS: TOTAL RECALL GAME
+***************************************************************/
+	function TotalRecallGame(userOptions){
+
+		var username;
 		var gameDetails = {};
 		var cardsURL;
 		var cardsData = {};
@@ -17,68 +22,114 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		var firstCard = { id: null, $card: null, value: null};
 		var secondCard = { id: null, $card: null, value: null};
 		var cardsLeft;
+		var animationDuration = 500;
 
 		var solverQueue;
-		var solverMemory={};
-		var solverMatchesList=[];
+		var solverMemory = {};
+		var solverMatchesList = [];
+		var solverActive = false;
+
+		var options = {
+			URL: "http://totalrecall.99cluster.com/games/",
+			cardMargin: 10
+		};
+		$.extend(true, options, userOptions);
 
 
-		// GAME SETUP
+		//SETUP
 		this.init = function(){
-			$("#signin").on("click", handleSignin);
-			$("#gameboard").on("click", ".gameboard__row__card", cardClicked);
+			$("#submit-signin").on("click", handleSignin);
+			$("#gameboard").on("click", ".card", cardClicked);
 			$("#solve").on("click", solveGame);
+			$("#submit-again").on("click", playAgain);
+			getAnimDuration();
 		};
 
 
+		// GET THE DURATION OF CARD FLIP ANIMATIONS
+		// (assumption: css value is a valid, properly formatted value)
+		function getAnimDuration(){
+			
+			var time =  $(".card").css("transition-duration");
+			if ( time.indexOf("ms") > 0){
+				animationDuration = parseInt(time, 10);
+			}
+			else if ( time.indexOf("s") > 0 ){
+				animationDuration = parseFloat(time, 10) * 1000;
+			}
+		}
 
-		//Get the game data via ajax call
+
+		// SHOW MESSAGE IN GAME STATUS-BAR AREA
+		function showMessage(message, delay){
+
+			setTimeout(
+				function(){	$("#message").text(message); },
+				(delay || 0)  //default of no delay
+			);
+		}
+
+
+		// PREP SCREEN FOR GAME
 		function handleSignin(event){
 			event.preventDefault();
 
+			//Save users name
+			username = $("#name").val();
+			showMessage("Welcome " + username);
+
 			//Show wait spinner
 			$("#signin").hide();
-			$("#wait").css("display", "inline-block");
+			$("#wait").show();
+
+			getGame();
+		}
 
 
-			var signinDetails = $("#signinForm").serialize();
+		// GET THE GAME DATA VIA AJAX CALL
+		function getGame(){
+
+			var signinDetails = $("#signin").serialize();
+
 			$.ajax({
-				url: URL,
+				url: options.URL,
 				type: "POST",
 				data: signinDetails,
 				success: initGame,
-				error: handleAjaxError
+				error: handleInitAjaxError
 			});
 		}
 
 
-
-		function handleAjaxError(jqXHR, status, error){
-			console.log("error: ", status, " ", error);
+		function handleInitAjaxError(jqXHR, status, error){
+			console.log("game init ajax error:", status, error);
 		}
-
-
 
 
 		function initGame(gameData){
 			
 			var cardsHTML = "";
 			var cardID;
-			
-			checkGameData(gameData);
 
+			//Reset card data
+			cardsData = {};
+			firstCard.id = secondCard.id = null;
+			firstCard.$card = secondCard.$card = null;
+			firstCard.value = secondCard.value = null;
+
+			checkGameData(gameData);
 			gameDetails = gameData;
-			cardsURL = URL + gameDetails.id + "/cards/";
+			cardsURL = options.URL + gameDetails.id + "/cards/";
 
 
 			//FILL GAME BOARD WITH CARDS
 			for(var y = 0; y < gameData.height; y++){
 
-				cardsHTML += "<div class='gameboard__row'>";
+				cardsHTML += "<div class='row'>";
 				
 				for(var x = 0; x < gameData.width; x++){
 					cardID = "card-" + x +"-" + y;
-					cardsHTML += "<div class='gameboard__row__card gameboard__row__card--inplay' id='" + cardID + "'><div class='gameboard__row__card__face gameboard__row__card__face--front'></div><div class='gameboard__row__card__face gameboard__row__card__face--back'></div></div>";
+					cardsHTML += "<div class='card card--inplay' id='" + cardID + "'><div class='card__face card__face--front'></div><div class='card__face card__face--back'></div></div>";
 					
 					//Save the card's coordinates so they dont have to be recomputed later
 					cardsData[cardID] = {coords:  {x: x, y: y}, value: null, matched: false, seen: false};
@@ -88,10 +139,16 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 
 			cardsLeft = gameData.height * gameData.width;
 
-			//Add to gameboard
-			$("#intro-wrapper").hide();
+			//Add cards to gameboard
+			$("#wait").hide();
+			$("#dialogbox").hide();
 			$("#gameboard").html(cardsHTML);
 			setGameboardSizes();
+			allowGuess = true;
+			solverActive = false;
+
+			showMessage("Pick a card " + username);
+			$("#solve-message").addClass("footer__title--show");
 		}
 
 
@@ -100,42 +157,39 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 			var margin, marginsWidth, marginsHeight;
 			var cardsWidth, cardWidth;
 			var cardsHeight, cardHeight;
-			var totalHeight = $(window).height();
 
-			$("#gameboard").css("height", "80%");
+			$("#gameboard").addClass("gameboard--fullheight");
 
-			margin = 10; //$(".gameboard__row__card").css("margin-left").replace("px","");
-			marginsWidth = margin * (gameDetails.width - 1);
-			cardsWidth = $(".gameboard__row").width() - marginsWidth;
+			marginsWidth = options.cardMargin * (gameDetails.width - 1);
+			cardsWidth = $(".row").width() - marginsWidth;
 			cardWidth = Math.floor( cardsWidth / gameDetails.width );
 			cardWidth -= 2; //for border
 
 			marginsHeight = margin * (gameDetails.height - 1);
-			cardsHeight = $(".gameboard").height() - marginsWidth;
+			cardsHeight = $("#middle").height() - marginsWidth;
 			cardHeight = Math.floor( cardsHeight / gameDetails.height );
 			cardHeight -= 2;
 
-			//Utilities.addStyle(".gameboard__row__card", "width:"+cardWidth+"px");	
-			$(".gameboard__row__card").each(function(){
+			$(".card").each(function(){
 				$(this)
 					.width(cardWidth)
 					.height(cardHeight)
-					.find(".gameboard__row__card__face--front").css("line-height", cardHeight+"px");
+					.find(".card__face--front").css("line-height", cardHeight+"px");
 			});
 				
 		}
 
 
-
 		function checkGameData(gameData){
 
-			if (!gameData.id || isNaN(gameData.width) || isNaN(gameData.height))
+			if (!gameData.id || isNaN(gameData.width) || isNaN(gameData.height)){
 				console.log("error with game data");
-			else
+				console.log(gameData);
+			}
+			else{
 				console.log("game data okay");
+			}
 		}
-
-
 
 
 		function cardClicked(event){
@@ -146,28 +200,32 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 				return;
 			}
 
+			//No manual user clicks allowed if auto solver in action
+			if(solverActive && event.originalEvent){
+				console.log("auto solver active. no manual clicks allowed.");
+				return;
+			}
+
 			//Block further clicks while this card is handled
 			allowGuess = false;
 
 			var $card = $(event.currentTarget);
 
 			//No clicks allowed on currently showing cards or matched cards
-			if( $card.hasClass("gameboard__row__card--showing") || $card.hasClass("gameboard__row__card--matched")){
+			if( $card.hasClass("card--showing") || $card.hasClass("card--matched")){
 				console.log('card already showing or matched');
 				return;
 			}
 
+			showMessage("Loading your card...");
 
-			var theCardData = cardsData[ $card.attr("id") ];
-			var targetURL = cardsURL + theCardData.coords.x + "," + theCardData.coords.y;
+			var cardID = $card.attr("id");
+			var targetURL = cardsURL + cardsData[cardID].coords.x + "," + cardsData[cardID].coords.y;
 
 			$.ajax({
 				url: targetURL,
 				type: "GET",
 				success: function(data){
-
-					theCardData.value = data; //Save the value first
-					theCardData.seen = true;
 					showCard( $card, data);
 				},
 				error: cardAjaxError
@@ -175,21 +233,20 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		}
 
 
-
 		function cardAjaxError(jqXHR, status, error){
 			console.log("something went wrong looking up the card: ", status, " ", error);
 		}
 
 
-
 		function showCard($card, value){
+
+			saveForSolver($card, value);
 
 			//Show new card
 			$card
-				.addClass("gameboard__row__card--showing gameboard__row__card--flipped")
-				.find(".gameboard__row__card__face--front").text(value);
+				.addClass("card--showing card--flipped")
+				.find(".card__face--front").text(value);
 				
-
 			//Is first card of current pair of clicks
 			if(!firstCard.id){
 				firstCard.id = $card.attr("id");
@@ -197,6 +254,8 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 				firstCard.value = value;
 				allowGuess = true;
 				$("#gameboard").trigger("gameready");
+
+				showMessage("Pick the matching card");
 			}
 
 			//Is second card of current pair of clicks
@@ -209,37 +268,26 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		}
 
 
-
 		function checkPair(){
  
 			//Mismatch
 			if( firstCard.value !== secondCard.value){
-				
-				//Save card info for the auto-solver
-				saveForSolver();
-
+				showMessage("Darn, no match. Try again.", animationDuration);
 				setTimeout( hidePair, 1000);
 			}
 
 			//Match found
 			else{
+				showMessage("Woohoo!  Pair matched!", animationDuration);
 				setTimeout( pairMatched, 1000);
 			}
 		}
-			
 
 
 		function hidePair(){
 			
-			firstCard.$card
-				//.text("")
-				.removeClass("")
-				.removeClass("gameboard__row__card--showing gameboard__row__card--flipped");
-
-			secondCard.$card
-				//.text("")
-				.removeClass("gameboard__row__card--showing gameboard__row__card--flipped");
-
+			firstCard.$card.removeClass("card--showing card--flipped");
+			secondCard.$card.removeClass("card--showing card--flipped");
 
 			//reset pair
 			firstCard.id = secondCard.id = null;
@@ -250,20 +298,20 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		}
 
 
-
 		function pairMatched(){
 
 			//Mark the cards as matched
 			firstCard.$card
-				.removeClass("gameboard__row__card--inplay")
-				.find(".gameboard__row__card__face--front").addClass("gameboard__row__card__face--matched");
+				.removeClass("card--inplay")
+				//.find(".card__face--front")
+				.addClass("card__face--matched");
 
 			secondCard.$card
-				.removeClass("gameboard__row__card--inplay")
-				.find(".gameboard__row__card__face--front").addClass("gameboard__row__card__face--matched");
+				.removeClass("card--inplay")
+				//.find(".card__face--front")
+				.addClass("card__face--matched");
 
 			cardsData[firstCard.id].matched = cardsData[secondCard.id].matched = true;
-
 
 			//reset pair
 			firstCard.id = secondCard.id = null;
@@ -275,23 +323,23 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 			//More matches to be made
 			if(cardsLeft > 2){
 				allowGuess = true;
-				setTimeout(function(){$("#gameboard").trigger("gameready")}, 200);
+				showMessage("Pick another card", animationDuration);
+				setTimeout(function(){$("#gameboard").trigger("gameready");}, 200);
 			}
 
 			//All pairs identified, game over
 			else{
-				allowGuess = true;  //TEMP: REMOVE IN LIVE
 				endGame();
 			}
 		}
  
 
-
 		function endGame(){
 
+			solverActive = false;
+
 			//Get last pair
-			var lastCards = $("#gameboard .gameboard__row__card--inplay");
-			var value;
+			var lastCards = $("#gameboard .card--inplay");
 
 			console.log("lastcards: ", lastCards);
 
@@ -300,25 +348,14 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 				return;
 			}
 
-			//Get value if known
-			//value = cardsData[ lastCards[0].attr("id") ].value || cardsData[ lastCards[1].attr("id") ].value;
-
-			//if (!value){
-				// cardClicked( {currentTarget: "#"+lastCards[0].id} );
-				// cardClicked( {currentTarget: "#"+lastCards[1].id} );
-			//}
-			//else
-
-
 			var cardData = cardsData[ $(lastCards[0]).attr("id") ];
 			var coordsString = "x1=" + cardData.coords.x + "&y1=" + cardData.coords.y;
 
 			cardData = cardsData[ $(lastCards[1]).attr("id") ];
 			coordsString += "&x2=" + cardData.coords.x + "&y2=" + cardData.coords.y;
-			
 
 			$.ajax({
-				url: URL + gameDetails.id + "/end",
+				url: options.URL + gameDetails.id + "/end",
 				type: "POST",
 				data: coordsString,
 				success: endGameResult,
@@ -331,30 +368,33 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		function endGameResult(data){
 
 			console.log("success: ", data.success);
+
 			if (data.success){
-				alert("you won!");
+				showMessage("");
+				$("#endgame").show();
+				$("#dialogbox")
+					.addClass("dialogbox--whiteshadow")
+					.fadeIn(500);
 			}
 			else{
-				alert("boo you lost!");
+				console.log("error ending game");
 			}
 		}
+
 
 		function endGameError(jqXHR, status, error){
 			console.log("error ending game: ", status, " ", error);
 		}
 
 
-
-
 		//FINISH GAME AUTOMATICALLY
 		function solveGame(){
 
-			var x;
-			var y;
-			var cardID;
-
-
 			if( cardsLeft > 2){
+
+				solverActive = true;
+
+				$("#solve-message").removeClass("footer__title--show");
 
 				//Prep handlers for saving card data and picking next cards
 				$("#gameboard").on("gameready", pickNextCard);
@@ -366,41 +406,27 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 
 		
 		//SAVE CARDS TO SOLVER MEMORY
-		function saveForSolver(){
+		function saveForSolver($card, value){
 			
+			var cardID = $card.attr("id");
+			cardsData[cardID].seen = true;
+
 			//Haven't seen this letter before, just save to memory
-			if( !solverMemory[firstCard.value] ){
-				solverMemory[firstCard.value] = firstCard.id;
+			if( !solverMemory[value] ){
+				solverMemory[value] = cardID;
 			}
 
 			//Have seen this letter before, add it to our list of known matches
 			else{
-				solverMatchesList.push( firstCard.id );
+				solverMatchesList.push( cardID );
 			}
-
-
-			//Haven't seen this letter before, just save to memory
-			if( !solverMemory[secondCard.value] ){
-				solverMemory[secondCard.value] = secondCard.id;
-			}
-
-			//Have seen this letter before, add it to our list of known matches
-			else{
-				solverMatchesList.push( secondCard.id );
-			}
-
 		}
-
 
 
 		//AUTO-SOLVER PICK NEXT CARD
 		function pickNextCard(){
 
 			var match;
-			var x;
-			var y;
-			var cardID;
-
 
 			//Stop when only 2 cards left
 			console.log("cardsLeft ", cardsLeft);
@@ -414,7 +440,6 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 			if(!firstCard.id){
 				$("#"+pickCard()).click();
 			}
-
 
 			//Picking second card
 			else{
@@ -435,39 +460,32 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		}
 
 
-
 		//PICK A CARD AT RANDOM (ONE THAT HASN'T BEEN SEEN BEFORE)
 		function pickCard(){
-			var x;
-			var y;
+
 			var cardID;
-			var i = 0;
 
 			//If a match is known, pick one of those
 			if( solverMatchesList.length > 0){
 				cardID = solverMatchesList.pop();
 			}
 			
-
 			//Otherwise pick a random card...
 			else{
 				//generate random series of cards to pick
-				if (!solverQueue){
+				if (!solverQueue || solverQueue.length === 0){
 					generateSolverQueue();
 				}
 
-				//pop next unseen card
+				//Pop next unseen card
 				do{
 					cardID = solverQueue.pop();
-				} while( cardsData[cardID].seen === true );
+				} while( cardsData[cardID].seen == true );
 			}
 
-
-			$("#"+cardID).addClass("");
+			console.log("card picked: ", cardID);
 			return cardID;
 		}
-			
-
 
 
 		// GENERATES A RANDOMISED LIST OF CARDS FOR USE BY AUTO-SOLVER ROUTINE
@@ -482,22 +500,34 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 			//Create array for randomised list
 			solverQueue = new Array(numCards);
 
-
 			//Assign every card ID into randomised list
-			for(var y = 0; y < gameDetails.height; y++){				
-				for(var x = 0; x < gameDetails.width; x++){
+			for(y = 0; y < gameDetails.height; y++){
+				for(x = 0; x < gameDetails.width; x++){
 
 					cardID = "card-" + x +"-" + y;
 					
 					//Get random position
 					do{
 						pos = Math.floor(Math.random() * numCards);
-					} while ( solverQueue[pos] != undefined)
+					} while ( solverQueue[pos] !== undefined);
 
 					solverQueue[pos] = cardID;
 				}
 			}
+		}
 
+
+		function playAgain(event){
+			event.preventDefault();
+
+			//Show wait spinner
+			$("#endgame").hide();
+			$("#wait").show();
+
+			$("#gameboard").empty();
+
+			showMessage("Getting your new game now...");
+			getGame();
 		}
 	}
 

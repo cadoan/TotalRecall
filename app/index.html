@@ -12,6 +12,8 @@
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
         <!-- build:css(.tmp) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
+        <link href='http://fonts.googleapis.com/css?family=Lobster+Two:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Cabin:400,500,600,700,400italic,500italic,600italic,700italic' rel='stylesheet' type='text/css'>
         <!-- endbuild -->
         <!-- build:js scripts/vendor/modernizr.js -->
         <script src="bower_components/modernizr/modernizr.js"></script>
@@ -22,45 +24,54 @@
             <p class="browsehappy">Really, you choose to use an old IE?  Really??</p>
         <![endif]-->
 
-        <header>
-            TOTAL RECALL GAME
+        <header class="header">
+            <h1 class="header__title">Total Recall!</h1>
         </header>
+        <div class="messagebar">
+            <h2 class="messagebar__message" id="message"></h2>
+        </div>
 
-        <div class="intro-wrapper" id="intro-wrapper">
+        <div class="middle" id="middle">
+            <div class="dialogbox" id="dialogbox">
 
-            <div class="signin" id="signin">
-                <form id="signinForm" class="signin__form" novalidate>
+                <form id="signin" class="signin" novalidate>
 
-                    <h1 class="signin__form__title">Hi there!  Come play a game of Total Recall!</h1>
+                    <h1 class="signin__title">Hi there!  Come play a game of <em>Total Recall!</em></h1>
 
-                    <h2 class="signin__form__intro">Tells us your name and email, if you'd like to</h2>
+                    <h2 class="signin__intro">Tells us your name and email, if you'd like to</h2>
 
-                    <input type="text" class="signin__form__text-input" name="name">
-                    <input type="email" class="signin__form__text-input" name="email">
-                    <input type="submit" class="signin__form__submit" id="signin">
+                    <input type="text" class="signin__text-input" name="name" id="name">
+                    <input type="email" class="signin__text-input" name="email">
+                    <input type="submit" class="signin__submit" value="Start Game!" id="submit-signin">
                 </form>
-            </div>
-
-            <div class="wait" id="wait">
-                <h2 class="wait__message">Loading your totes amazing game now.  Any second now...</h2>
-                <img class="wait__animation" src="images/loader.gif">
-            </div>
-        </div>
 
 
-
-        <div class="gameboard" id="gameboard">
-            <div class="gameboard__row">
-                <div class="gameboard__row__card">
-                    <div class="gameboard__row__card__face gameboard__row__card__face--front"></div>
-                    <div class="gameboard__row__card__face gameboard__row__card__face--back"></div>
+                <div class="wait" id="wait">
+                    <h2 class="wait__message">Loading your totes amazing game now.  Any second now...</h2>
+                    <img class="wait__animation" src="images/loader.gif">
                 </div>
+
+                <div class="endgame" id="endgame">
+                    <h2 class="endgame__message"><em>Congratulations!</em> You won!</h2>
+                    <form>
+                        <input type="submit" class="endgame__submit" value="Play Again" id="submit-again">
+                    </form>
+                </div>
+
             </div>
+
+            <div class="gameboard" id="gameboard">
+                <div class="row">
+                    <div class="card">
+                        <div class="card__face card__face--front"></div>
+                        <div class="card__face card__face--back"></div>
+                    </div>
+                </div>
+            </div>            
         </div>
 
-        
-        <footer>
-            <button type="button" id="solve">Solve game</button>
+        <footer class="footer">
+            <h1 class="footer__title" id="solve-message"> Boo, I suck! <a href="#" class="footer__link" id="solve">Solve this game for me!</a></h1>
         </footer>
 
         <!-- build:js scripts/vendor.js -->
