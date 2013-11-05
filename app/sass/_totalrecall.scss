@@ -37,16 +37,16 @@ em{
 	display: table;
 	width: 100%;
 	height: 10%;
-	font-size: 2rem;
-	color: white;
+	min-height: 5rem;
 	background: $feature-color;
 	box-shadow: 0px 3px 3px rgba(0,0,0, 1);
 
 	@include element(title){
 		display: table-cell;
 		vertical-align: middle;
+		color: white;
 		font-family: $feature-font;
-		font-size: 5rem;
+		font-size: 4rem;
 		font-style: italic;
 		text-align: center;
 		text-shadow: 2px 3px 2px rgba(0, 0, 0, .5);
@@ -72,20 +72,25 @@ em{
 
 //BLOCK
 .middle{
-	display: table;
+	//display: table;
 	width: 100%;
 	height: 80%;
 	position: relative;
+	text-align: center;
+
+	&:before{
+		content: '';
+  		display: inline-block;
+  		height: 100%;
+  		vertical-align: middle;
+	}
 }
 
 //BLOCK
 .dialogbox{
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	margin: auto;
+
+	display: inline-block;
+	vertical-align: middle;
 	overflow: hidden;
 	z-index: 1;
 
@@ -103,10 +108,14 @@ em{
 		@include box-shadow(0px 0px 30px rgba(255,255,255,.4));
 	}
 
+	&:before{
+
+	}
+
 	> div, form{
 		box-sizing: border-box;
 		height: 100%;
-		padding: 20px 30px;
+		padding: 24px 30px;
 		text-align: center;
 	}
 }
@@ -133,8 +142,8 @@ em{
 	}
 	@include element(text-input){
 		vertical-align: top;
-		height: 20px;
-		padding: 10px;
+		height: 40px;
+		padding: 0;
 		color: #333;
 		font-size: 20px;
 		border-radius: 5px;
@@ -143,7 +152,8 @@ em{
 	@include element(submit){
 		box-sizing: border-box;
 		vertical-align: top;
-		height: 40px;
+		height: 43px;
+		padding: 0 15px;
 		color: white;
 		background: #060;
 		font-size: 20px;
@@ -161,15 +171,8 @@ em{
 
 //BLOCK
 .wait{
-	display: none;
+	vertical-align: middle;
 	background: white;
-	position: absolute;
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	margin: auto;	
 
 	@include element(message){
 		margin: 20px 0;
@@ -220,20 +223,28 @@ em{
 
 //BLOCK
 .gameboard{
-	display: table-cell;
+	display: none;
 	vertical-align: middle;
 	height: 0;
-	max-width: 700px;
+	max-width: 1000px;
 	min-width: 500px;
 	margin: 0 auto;
 	padding: 20px 0;
 	text-align:center;
+
+	@include modifier(show){
+		display: inline-block;
+	}
 }
 
 
 //BLOCK: Row - aggregated by gameboard
 .row{
 	margin-bottom: 10px;
+
+	&:last-child{
+		margin: 0;
+	}
 }
 
 
@@ -246,15 +257,17 @@ em{
 	
 	max-width: 130px;
 	max-height: 200px;
-	margin-left: 10px;   
-	&:first-child{ margin-left: 0 } 
+	margin-right: 10px;   
+	&:last-child{ margin-right: 0 } 
 	
 	box-shadow: 3px 3px 5px rgba(0,0,0,.5);
 	cursor: pointer;
 
+	opacity: 1;
+
 	@include perspective(600px);
 	@include transform-style(preserve-3d);
-	@include transition-property(transform);
+	@include transition-property(transform, opacity);
 	@include transition-duration(500ms);
 	
 	@include modifier(flipped){
@@ -267,10 +280,11 @@ em{
 
 
 	@include modifier(matched){
+		opacity: .3;
 
-		@include element(face){
+		.card__face--front{
 			cursor: default;
-			background: pink;				
+			color: #999;		
 		}
 
 	}
@@ -292,18 +306,15 @@ em{
 		}
 		@include modifier(front){
 			background: white;
-			font-weight: bold;		
-			text-transform: uppercase;			
-			font-size: 50px;
+			font-family: $feature-font;
+			//text-transform: uppercase;			
+			font-weight: bold;
+			font-size: 70px;
 			text-align: center;	
-			color: black;
+			color: $feature-color;
 			@include transform (rotateY(180deg));
 		}
 
-		// @include modifier(matched){
-		// 	cursor: default;
-		// 	background: pink;	
-		// }
 	}
 
 }
@@ -314,6 +325,7 @@ em{
 .footer{
 	display: table;
 	width: 100%;
+	min-height: 3rem;
 	height: 6.5%;
 	font-size: 2rem;
 	color: white;
@@ -321,18 +333,19 @@ em{
 	box-shadow: 0px -3px 3px rgba(0,0,0, .4);
 
 	@include element(title){
-		display: table-cell;
+		@include transition-property(opacity);
+		@include transition-duration(1s);
 		opacity: 0;
+		display: none;
 		vertical-align: middle;
 		font-family: $feature-font;
-		font-size: 3rem;
+		font-size: 2.5rem;
 		text-align: center;
 		line-height: 100%;
 		text-shadow: 2px 3px 2px rgba(0, 0, 0, .5);
-		@include transition-property(opacity);
-		@include transition-duration(1s);
 
 		@include modifier(show){
+			display: table-cell;			
 			opacity: 1;
 		}
 	}

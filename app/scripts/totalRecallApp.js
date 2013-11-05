@@ -1,5 +1,5 @@
 /*jshint -W109 */
-define(['jquery', 'utilities'], function ($, Utilities) {
+define(['jquery'], function ($) {
 	'use strict';
 
 
@@ -14,6 +14,25 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 ***************************************************************/
 	function TotalRecallGame(userOptions){
 
+
+		var $game = {
+			gameboard: null,
+			dialogbox: null,
+			signin: null,
+			wait: null,
+			endgame: null,
+			rowTemplate: null,
+			cardTemplate: null
+		};
+
+		// var $gameboard;
+		// var $dialogbox;
+		// var $signin;
+		// var $wait;
+		// var $endgame;
+		// var $rowTemplate;
+		// var $cardTemplate;
+
 		var username;
 		var gameDetails = {};
 		var cardsURL;
@@ -24,25 +43,37 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		var cardsLeft;
 		var animationDuration = 500;
 
-		var solverQueue;
+		var solverUnseenQueue;
+		var solverRemainingQueue;
 		var solverMemory = {};
 		var solverMatchesList = [];
 		var solverActive = false;
 
 		var options = {
 			URL: "http://totalrecall.99cluster.com/games/",
-			cardMargin: 10
+			gameboard: "gameboard",
+			dialogbox: "dialogbox",
+			signin: "signin",
+			wait: "wait",
+			endgame: "endgame",
+			rowTemplate: "rowTemplate",
+			cardTemplate: "cardTemplate"
 		};
 		$.extend(true, options, userOptions);
 
 
 		//SETUP
 		this.init = function(){
-			$("#submit-signin").on("click", handleSignin);
+
+			//Link up jQuery objects to the IDs set in options
+			for(var prop in $game){
+				$game[prop] = $("#" + options[prop]);
+			}
+
+			$game.signin.find("input[type=submit]").on("click", handleSignin);
 			$("#gameboard").on("click", ".card", cardClicked);
 			$("#solve").on("click", solveGame);
 			$("#submit-again").on("click", playAgain);
-			getAnimDuration();
 		};
 
 
@@ -90,7 +121,7 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		function getGame(){
 
 			var signinDetails = $("#signin").serialize();
-
+			$.support.cors = true;
 			$.ajax({
 				url: options.URL,
 				type: "POST",
@@ -108,8 +139,14 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 
 		function initGame(gameData){
 			
-			var cardsHTML = "";
+			var $rowsHolder = $("<div/>");  //Temporary holder for rows markup
 			var cardID;
+			var rowTemplate;
+			var rowInner;
+			var cardTemplate;
+
+			$("#wait").hide();
+			$("#dialogbox").hide();
 
 			//Reset card data
 			cardsData = {};
@@ -120,66 +157,94 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 			checkGameData(gameData);
 			gameDetails = gameData;
 			cardsURL = options.URL + gameDetails.id + "/cards/";
-
-
-			//FILL GAME BOARD WITH CARDS
-			for(var y = 0; y < gameData.height; y++){
-
-				cardsHTML += "<div class='row'>";
-				
-				for(var x = 0; x < gameData.width; x++){
-					cardID = "card-" + x +"-" + y;
-					cardsHTML += "<div class='card card--inplay' id='" + cardID + "'><div class='card__face card__face--front'></div><div class='card__face card__face--back'></div></div>";
-					
-					//Save the card's coordinates so they dont have to be recomputed later
-					cardsData[cardID] = {coords:  {x: x, y: y}, value: null, matched: false, seen: false};
-				}
-				cardsHTML += "</div>";
-			}
-
 			cardsLeft = gameData.height * gameData.width;
 
+			cardTemplate = $("#cardTemplate").html();
+			rowTemplate = $("#rowTemplate").html();
+
+			//FILL GAME BOARD WITH CARDS
+			// I wasn't sure if a templating system like Handlebars was allowed, so I did it manually
+			for(var y = 0; y < gameData.height; y++){
+
+				rowInner = "";
+				
+				for(var x = 0; x < gameData.width; x++){
+					
+					cardID = "card-" + x +"-" + y;
+
+					//Save the card's coordinates so they dont have to be recomputed later
+					cardsData[cardID] = {coords:  {x: x, y: y}, value: null, matched: false, seen: false};
+					
+					//Add card to row
+					rowInner += cardTemplate.replace("%CARDID%", cardID);
+				}
+
+				$rowsHolder.append( $(rowTemplate).append(rowInner) );
+			}
+
 			//Add cards to gameboard
-			$("#wait").hide();
-			$("#dialogbox").hide();
-			$("#gameboard").html(cardsHTML);
-			setGameboardSizes();
+			$("#gameboard").html( $rowsHolder.html() );
+			setGameboardProperties();
+			$("#gameboard").addClass("gameboard--show");
+
 			allowGuess = true;
 			solverActive = false;
 
+			$("#solve-message").addClass("footer__title--preshow footer__title--show");
 			showMessage("Pick a card " + username);
-			$("#solve-message").addClass("footer__title--show");
 		}
 
 
-		function setGameboardSizes(){
+		//SET GAMEBOARD ATTRIBUTES
+		function setGameboardProperties(){
 
-			var margin, marginsWidth, marginsHeight;
-			var cardsWidth, cardWidth;
-			var cardsHeight, cardHeight;
+			var margin, totalMarginsWidth, totalMarginsHeight;
+			var padding;
+			var totalCardsWidth, cardWidth;
+			var totalCardsHeight, cardHeight;
+			var maxWidth, maxHeight;
+			var $card;
 
+			//Get animation timing info
+			getAnimDuration();
+
+			//SIZING
+			//Gameboard area sizing
 			$("#gameboard").addClass("gameboard--fullheight");
 
-			marginsWidth = options.cardMargin * (gameDetails.width - 1);
-			cardsWidth = $(".row").width() - marginsWidth;
-			cardWidth = Math.floor( cardsWidth / gameDetails.width );
-			cardWidth -= 2; //for border
+			//Card sizing
+			$card = $(".card").first();
+			maxWidth = parseInt( $card.css("max-width"), 10);
+			maxHeight = parseInt( $card.css("max-height"), 10);
 
-			marginsHeight = margin * (gameDetails.height - 1);
-			cardsHeight = $("#middle").height() - marginsWidth;
-			cardHeight = Math.floor( cardsHeight / gameDetails.height );
-			cardHeight -= 2;
+			//Width
+			margin = parseInt( $card.css("margin-right"), 10);
+			totalMarginsWidth = margin * (gameDetails.width - 1);
+			totalCardsWidth = $("#gameboard").parent().width() - totalMarginsWidth;
+			cardWidth = Math.floor( totalCardsWidth / gameDetails.width );
+			cardWidth = Math.min( cardWidth, maxWidth );
+
+			//Height
+			var $row = $(".row").first();
+			margin = parseInt( $row.css("margin-bottom"), 10);
+			totalMarginsHeight = margin * (gameDetails.height - 1);
+			padding = parseInt( $("#gameboard").css("padding-top"), 10) + parseInt( $("#gameboard").css("padding-bottom"), 10);
+
+			totalCardsHeight = $("#gameboard").parent().height() - totalMarginsHeight - padding;
+			cardHeight = Math.floor( totalCardsHeight / gameDetails.height );
+			cardHeight = Math.min( cardHeight, maxHeight );
 
 			$(".card").each(function(){
 				$(this)
 					.width(cardWidth)
 					.height(cardHeight)
-					.find(".card__face--front").css("line-height", cardHeight+"px");
+					.find(".card__face--front").css("line-height", (cardHeight-10) +"px");  //-10px for line height for font adjustment
 			});
 				
 		}
 
 
+		// VALIDATE GAME DATA
 		function checkGameData(gameData){
 
 			if (!gameData.id || isNaN(gameData.width) || isNaN(gameData.height)){
@@ -192,6 +257,7 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		}
 
 
+		//SINGLE CARD CLICK HANDLER
 		function cardClicked(event){
 
 			//No clicks allowed if already handling a pair of cards 
@@ -223,9 +289,13 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 			var targetURL = cardsURL + cardsData[cardID].coords.x + "," + cardsData[cardID].coords.y;
 
 			$.ajax({
+				crossDomain: true,
 				url: targetURL,
 				type: "GET",
 				success: function(data){
+
+					cardsData[cardID].value = data; //Save the value first
+					cardsData[cardID].seen = true;
 					showCard( $card, data);
 				},
 				error: cardAjaxError
@@ -234,13 +304,12 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 
 
 		function cardAjaxError(jqXHR, status, error){
-			console.log("something went wrong looking up the card: ", status, " ", error);
+			console.log("something went wrong looking up the card: ", status, error);
 		}
 
 
+		// TRIGGER CARD ANIMATION
 		function showCard($card, value){
-
-			saveForSolver($card, value);
 
 			//Show new card
 			$card
@@ -268,10 +337,13 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		}
 
 
+		// COMPARE EACH PAIR OF CARDS
 		function checkPair(){
  
 			//Mismatch
 			if( firstCard.value !== secondCard.value){
+				//Save card info for the auto-solver
+				saveForSolver();
 				showMessage("Darn, no match. Try again.", animationDuration);
 				setTimeout( hidePair, 1000);
 			}
@@ -284,6 +356,7 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		}
 
 
+		//NO MATCH FOUND
 		function hidePair(){
 			
 			firstCard.$card.removeClass("card--showing card--flipped");
@@ -298,18 +371,17 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		}
 
 
+		//MATCH FOUND
 		function pairMatched(){
 
 			//Mark the cards as matched
 			firstCard.$card
 				.removeClass("card--inplay")
-				//.find(".card__face--front")
-				.addClass("card__face--matched");
+				.addClass("card--matched");
 
 			secondCard.$card
 				.removeClass("card--inplay")
-				//.find(".card__face--front")
-				.addClass("card__face--matched");
+				.addClass("card--matched");
 
 			cardsData[firstCard.id].matched = cardsData[secondCard.id].matched = true;
 
@@ -333,10 +405,12 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 			}
 		}
  
-
+		//ALL MATCHES FOUND, WRAP UP.
 		function endGame(){
 
+			//Turn off auto solver
 			solverActive = false;
+			$("#gameboard").off("gameready", pickNextCard);
 
 			//Get last pair
 			var lastCards = $("#gameboard .card--inplay");
@@ -347,6 +421,9 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 				console.log("error ending game. there are not exactly two cards left");
 				return;
 			}
+
+			$(lastCards[0]).removeClass("card--inplay").addClass("card--matched");
+			$(lastCards[1]).removeClass("card--inplay").addClass("card--matched");
 
 			var cardData = cardsData[ $(lastCards[0]).attr("id") ];
 			var coordsString = "x1=" + cardData.coords.x + "&y1=" + cardData.coords.y;
@@ -365,6 +442,7 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		}
 
 
+		//CHECK RETURNED RESULT FROM AJAX
 		function endGameResult(data){
 
 			console.log("success: ", data.success);
@@ -383,7 +461,7 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 
 
 		function endGameError(jqXHR, status, error){
-			console.log("error ending game: ", status, " ", error);
+			console.log("error ending game: ", status, error);
 		}
 
 
@@ -391,48 +469,60 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 		function solveGame(){
 
 			if( cardsLeft > 2){
-
+				
+				//Init solver variables
+				solverUnseenQueue = null;
+				solverRemainingQueue = null;
+				solverMemory = {};
+				solverMatchesList = [];
 				solverActive = true;
 
-				$("#solve-message").removeClass("footer__title--show");
+				$("#solve-message").removeClass("footer__title--show footer__title--preshow");
 
 				//Prep handlers for saving card data and picking next cards
 				$("#gameboard").on("gameready", pickNextCard);
 
+				//Create random list of cards to pick
+				generateSolverUnseenQueue();
+
 				//Go head and pick first card
-				$("#"+pickCard()).click();
+				pickNextCard();
 			}
 		}
 
 		
 		//SAVE CARDS TO SOLVER MEMORY
-		function saveForSolver($card, value){
+		function saveForSolver(){
 			
-			var cardID = $card.attr("id");
-			cardsData[cardID].seen = true;
-
 			//Haven't seen this letter before, just save to memory
-			if( !solverMemory[value] ){
-				solverMemory[value] = cardID;
+			if( !solverMemory[firstCard.value] ){
+				solverMemory[firstCard.value] = firstCard.id;
 			}
 
 			//Have seen this letter before, add it to our list of known matches
 			else{
-				solverMatchesList.push( cardID );
+				solverMatchesList.push( firstCard.id );
+			}
+
+			//Haven't seen this letter before, just save to memory
+			if( !solverMemory[secondCard.value] ){
+				solverMemory[secondCard.value] = secondCard.id;
+			}
+
+			//Have seen this letter before, add it to our list of known matches
+			else{
+				solverMatchesList.push( secondCard.id );
 			}
 		}
 
 
-		//AUTO-SOLVER PICK NEXT CARD
+		//AUTO-SOLVER: PICK NEXT CARD
 		function pickNextCard(){
 
 			var match;
 
 			//Stop when only 2 cards left
-			console.log("cardsLeft ", cardsLeft);
-
 			if(cardsLeft <= 2){
-				$("#gameboard").off("gameready", pickNextCard);
 				return;
 			}
 
@@ -465,22 +555,39 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 
 			var cardID;
 
-			//If a match is known, pick one of those
+			// If a match is known, pick one of those
 			if( solverMatchesList.length > 0){
 				cardID = solverMatchesList.pop();
+				return cardID;
 			}
 			
-			//Otherwise pick a random card...
-			else{
-				//generate random series of cards to pick
-				if (!solverQueue || solverQueue.length === 0){
-					generateSolverQueue();
+
+			// Otherwise get a card from the random (unseen cards) list...
+			if( solverUnseenQueue.length > 0 ){
+				
+				do{
+					cardID = solverUnseenQueue.pop();
+					console.log("solver unseen cards pop:", cardID);
+				} while( cardID && cardsData[cardID].seen === true );
+			}
+
+
+			// ...but if we've run out of unseen cards, go back over one of the remaining (seen) cards
+			if( !cardID ) {
+
+				console.log("going back to remaning seen cards");
+
+				if( !solverRemainingQueue || solverRemainingQueue.length < 1 ){
+					generateRemainingQueue();
 				}
 
-				//Pop next unseen card
-				do{
-					cardID = solverQueue.pop();
-				} while( cardsData[cardID].seen == true );
+				cardID = solverRemainingQueue.pop();
+				console.log("solver seen cards pop:", cardID);
+
+				//if we've run out of unseen and seen cards, somethings broken
+				if(!cardID){
+					console.log('Somethings gone wrong, game should be over already.');
+				}
 			}
 
 			console.log("card picked: ", cardID);
@@ -489,7 +596,7 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 
 
 		// GENERATES A RANDOMISED LIST OF CARDS FOR USE BY AUTO-SOLVER ROUTINE
-		function generateSolverQueue(){
+		function generateSolverUnseenQueue(){
 
 			var numCards = gameDetails.width * gameDetails.height;
 			var x;
@@ -498,7 +605,7 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 			var pos;
 
 			//Create array for randomised list
-			solverQueue = new Array(numCards);
+			solverUnseenQueue = new Array(numCards);
 
 			//Assign every card ID into randomised list
 			for(y = 0; y < gameDetails.height; y++){
@@ -509,14 +616,26 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 					//Get random position
 					do{
 						pos = Math.floor(Math.random() * numCards);
-					} while ( solverQueue[pos] !== undefined);
+					} while ( solverUnseenQueue[pos] !== undefined);
 
-					solverQueue[pos] = cardID;
+					solverUnseenQueue[pos] = cardID;
 				}
 			}
 		}
 
 
+		// GENERATES A LIST OF THE REMAINING UNMATCHED CARDS
+		function generateRemainingQueue(){
+
+			solverRemainingQueue = [];
+
+			$(".card--inplay:not(.card--showing)").each(function(){
+				solverRemainingQueue.push( $(this).attr("id") );
+			});
+		}
+
+
+		// RESET GAME BOARD
 		function playAgain(event){
 			event.preventDefault();
 
@@ -530,7 +649,7 @@ define(['jquery', 'utilities'], function ($, Utilities) {
 			getGame();
 		}
 	}
-
+/* end TOTAL RECALL GAME CLASS ********************************************/
 
 	return new TotalRecallGame();
 });

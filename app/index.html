@@ -6,23 +6,20 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>totalrecall</title>
+        <title>Total Recall!</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
         <!-- build:css(.tmp) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
+        <!-- endbuild -->
         <link href='http://fonts.googleapis.com/css?family=Lobster+Two:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
         <link href='http://fonts.googleapis.com/css?family=Cabin:400,500,600,700,400italic,500italic,600italic,700italic' rel='stylesheet' type='text/css'>
-        <!-- endbuild -->
         <!-- build:js scripts/vendor/modernizr.js -->
         <script src="bower_components/modernizr/modernizr.js"></script>
         <!-- endbuild -->
     </head>
     <body>
-        <!--[if lt IE 10]>
-            <p class="browsehappy">Really, you choose to use an old IE?  Really??</p>
-        <![endif]-->
 
         <header class="header">
             <h1 class="header__title">Total Recall!</h1>
@@ -61,17 +58,24 @@
             </div>
 
             <div class="gameboard" id="gameboard">
-                <div class="row">
-                    <div class="card">
-                        <div class="card__face card__face--front"></div>
-                        <div class="card__face card__face--back"></div>
-                    </div>
-                </div>
-            </div>            
+            </div>
+
+
+            <script type="text/html" id="rowTemplate">
+                <div class="row"></div>           
+            </script>  
+
+
+            <script type="text/html" id="cardTemplate">
+                <div class="card card--inplay" id="%CARDID%">
+                    <div class="card__face card__face--front"></div>
+                    <div class="card__face card__face--back"></div>
+                </div>            
+            </script>           
         </div>
 
         <footer class="footer">
-            <h1 class="footer__title" id="solve-message"> Boo, I suck! <a href="#" class="footer__link" id="solve">Solve this game for me!</a></h1>
+            <h1 class="footer__title" id="solve-message"> Booo, I suck! <a href="#" class="footer__link" id="solve">Solve this game for me!</a></h1>
         </footer>
 
         <!-- build:js scripts/vendor.js -->

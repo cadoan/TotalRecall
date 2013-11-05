@@ -7,6 +7,6 @@ require.config({
 require(['totalRecallApp'], function (totalRecallApp) {
     'use strict';
    
-	totalRecallApp.init();
+	totalRecallApp.init( { URL: "http://totalrecall.99cluster.com/games/", gameboardID: "gameboard" });
    
 });
