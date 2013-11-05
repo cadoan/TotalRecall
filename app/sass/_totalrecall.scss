@@ -32,7 +32,7 @@ em{
 	font-style: italic;
 }
 
-//BLOCK
+
 .header{
 	display: table;
 	width: 100%;
@@ -70,49 +70,26 @@ em{
 }
 
 
-//BLOCK
+
 .middle{
-	//display: table;
 	width: 100%;
 	height: 80%;
 	position: relative;
-	text-align: center;
-
-	&:before{
-		content: '';
-  		display: inline-block;
-  		height: 100%;
-  		vertical-align: middle;
-	}
 }
 
-//BLOCK
+
 .dialogbox{
-
-	display: inline-block;
-	vertical-align: middle;
-	overflow: hidden;
-	z-index: 1;
-
+	position: absolute;
+	z-index: 99;
+	width: 100%;
 	text-align: center;
-	min-width: $minwidth;
-	max-width: $maxwidth;
-	max-height: 12rem;
-
-	border-radius: 10px;
-	border: 1px solid #333;
-
-	@include box-shadow(0px 0px 20px rgba(0,0,0,.5));
+	border-bottom: 1px solid #111;
 
 	@include modifier(whiteshadow){
 		@include box-shadow(0px 0px 30px rgba(255,255,255,.4));
 	}
 
-	&:before{
-
-	}
-
-	> div, form{
+	> div, > form{
 		box-sizing: border-box;
 		height: 100%;
 		padding: 24px 30px;
@@ -121,7 +98,7 @@ em{
 }
 
 
-//BLOCK
+
 .signin{	
 	background: $feature-color;
 		
@@ -137,8 +114,8 @@ em{
 		}
 	}
 	@include element(intro){
-
 		margin-bottom: 1rem;
+		color: #ccc;
 	}
 	@include element(text-input){
 		vertical-align: top;
@@ -169,8 +146,9 @@ em{
 }
 
 
-//BLOCK
+
 .wait{
+	display: none;
 	vertical-align: middle;
 	background: white;
 
@@ -183,16 +161,8 @@ em{
 .endgame{
 	display: none;
 	background: $feature-color;
-	position: absolute;
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	margin: auto;	
 
 	@include element(message){
-		margin: 20px 0;
 		color: white;
 		font-family: $feature-font;
 		font-size: 3.5rem;
@@ -201,8 +171,8 @@ em{
 			color: yellow;
 		}
 	}
-
 	@include element(submit){
+		display: inline-block;
 		box-sizing: border-box;
 		vertical-align: top;
 		height: 40px;
@@ -221,9 +191,16 @@ em{
 	}	
 }
 
-//BLOCK
+.gameboard-wrapper{
+	position: absolute;
+	width: 100%;	
+	height: 100%;
+}
+
 .gameboard{
 	display: none;
+	left: 0;
+	right: 0;
 	vertical-align: middle;
 	height: 0;
 	max-width: 1000px;
@@ -231,10 +208,6 @@ em{
 	margin: 0 auto;
 	padding: 20px 0;
 	text-align:center;
-
-	@include modifier(show){
-		display: inline-block;
-	}
 }
 
 
@@ -258,26 +231,14 @@ em{
 	max-width: 130px;
 	max-height: 200px;
 	margin-right: 10px;   
-	&:last-child{ margin-right: 0 } 
-	
-	box-shadow: 3px 3px 5px rgba(0,0,0,.5);
+	&:last-child{ margin-right: 0 }
+ 	
 	cursor: pointer;
-
 	opacity: 1;
-
-	@include perspective(600px);
-	@include transform-style(preserve-3d);
-	@include transition-property(transform, opacity);
-	@include transition-duration(500ms);
-	
-	@include modifier(flipped){
-		@include transform (rotateY(180deg));
-	}
 
 	@include modifier(showing){
 		cursor: default;
 	}
-
 
 	@include modifier(matched){
 		opacity: .3;
@@ -292,36 +253,54 @@ em{
 	@include element(face){
 		@include backface-visibility(hidden);
 		@include border-radius(10px);				
+		@include perspective(600px);
+		@include transform-style(preserve-3d);
+		@include transition-property(transform, opacity);
+		@include transition-duration(500ms);
+
 		display: block;
 		width: 100%;
 		height: 100%;
 		position: absolute;
 		overflow: hidden;
 		border: 1px solid #333;
-
+		box-shadow: 3px 3px 5px rgba(0,0,0,.5);
 
 		@include modifier(back){
+			@include backface-visibility(hidden);
 			background: url(../images/logo.png) center center no-repeat white;
 			background-size: contain; 
 		}
 		@include modifier(front){
+			@include transform (rotateY(180deg));
 			background: white;
-			font-family: $feature-font;
-			//text-transform: uppercase;			
+			color: $feature-color;
+			font-family: $feature-font;	
 			font-weight: bold;
 			font-size: 70px;
 			text-align: center;	
-			color: $feature-color;
-			@include transform (rotateY(180deg));
 		}
 
 	}
 
+	@include modifier(flipped){
+		.card__face--back{
+			@include transform (rotateY(180deg));
+
+			.no-csstransforms3d & {
+				display: none; //FOR IE9 and older browsers
+			}
+		}
+
+		.card__face--front{
+			@include transform (rotateY(0));
+		}
+	}
 }
 
 
 
-//BLOCK
+
 .footer{
 	display: table;
 	width: 100%;
@@ -354,9 +333,4 @@ em{
 		font-style: italic;
 		&:hover{ color: red;}
 	}
-}
-
-
-.border{
-	border: 1px solid red !important;
 }

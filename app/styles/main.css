@@ -138,31 +138,15 @@ em {
   width: 100%;
   height: 80%;
   position: relative;
-  text-align: center;
-}
-/* line 81, ../sass/_totalrecall.scss */
-.middle:before {
-  content: '';
-  display: inline-block;
-  height: 100%;
-  vertical-align: middle;
 }
 
-/* line 90, ../sass/_totalrecall.scss */
+/* line 81, ../sass/_totalrecall.scss */
 .dialogbox {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-  z-index: 1;
+  position: absolute;
+  z-index: 99;
+  width: 100%;
   text-align: center;
-  min-width: 600px;
-  max-width: 960px;
-  max-height: 12rem;
-  border-radius: 10px;
-  border: 1px solid #333;
-  -moz-box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
-  -webkit-box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid #111;
 }
 /* line 12, ../sass/_bem.scss */
 .dialogbox--whiteshadow {
@@ -170,15 +154,15 @@ em {
   -webkit-box-shadow: 0px 0px 30px rgba(255, 255, 255, 0.4);
   box-shadow: 0px 0px 30px rgba(255, 255, 255, 0.4);
 }
-/* line 115, ../sass/_totalrecall.scss */
-.dialogbox > div, .dialogbox form {
+/* line 92, ../sass/_totalrecall.scss */
+.dialogbox > div, .dialogbox > form {
   box-sizing: border-box;
   height: 100%;
   padding: 24px 30px;
   text-align: center;
 }
 
-/* line 125, ../sass/_totalrecall.scss */
+/* line 102, ../sass/_totalrecall.scss */
 .signin {
   background: #660000;
 }
@@ -190,13 +174,14 @@ em {
   text-shadow: 2px 3px 2px rgba(0, 0, 0, 0.5);
   color: white;
 }
-/* line 135, ../sass/_totalrecall.scss */
+/* line 112, ../sass/_totalrecall.scss */
 .signin__title em {
   font-size: 3rem;
 }
 /* line 5, ../sass/_bem.scss */
 .signin__intro {
   margin-bottom: 1rem;
+  color: #ccc;
 }
 /* line 5, ../sass/_bem.scss */
 .signin__text-input {
@@ -222,13 +207,14 @@ em {
   border: 1px solid #333;
   cursor: pointer;
 }
-/* line 165, ../sass/_totalrecall.scss */
+/* line 142, ../sass/_totalrecall.scss */
 .signin__submit:hover {
   background: #030;
 }
 
-/* line 173, ../sass/_totalrecall.scss */
+/* line 150, ../sass/_totalrecall.scss */
 .wait {
+  display: none;
   vertical-align: middle;
   background: white;
 }
@@ -237,31 +223,24 @@ em {
   margin: 20px 0;
 }
 
-/* line 183, ../sass/_totalrecall.scss */
+/* line 161, ../sass/_totalrecall.scss */
 .endgame {
   display: none;
   background: #660000;
-  position: absolute;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
 }
 /* line 5, ../sass/_bem.scss */
 .endgame__message {
-  margin: 20px 0;
   color: white;
   font-family: "Lobster Two", sans-serif;
   font-size: 3.5rem;
 }
-/* line 200, ../sass/_totalrecall.scss */
+/* line 170, ../sass/_totalrecall.scss */
 .endgame__message em {
   color: yellow;
 }
 /* line 5, ../sass/_bem.scss */
 .endgame__submit {
+  display: inline-block;
   box-sizing: border-box;
   vertical-align: top;
   height: 40px;
@@ -274,14 +253,23 @@ em {
   border: 1px solid #333;
   cursor: pointer;
 }
-/* line 218, ../sass/_totalrecall.scss */
+/* line 188, ../sass/_totalrecall.scss */
 .endgame__submit:hover {
   background: #030;
 }
 
-/* line 225, ../sass/_totalrecall.scss */
+/* line 194, ../sass/_totalrecall.scss */
+.gameboard-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+/* line 200, ../sass/_totalrecall.scss */
 .gameboard {
   display: none;
+  left: 0;
+  right: 0;
   vertical-align: middle;
   height: 0;
   max-width: 1000px;
@@ -290,21 +278,17 @@ em {
   padding: 20px 0;
   text-align: center;
 }
-/* line 12, ../sass/_bem.scss */
-.gameboard--show {
-  display: inline-block;
-}
 
-/* line 242, ../sass/_totalrecall.scss */
+/* line 215, ../sass/_totalrecall.scss */
 .row {
   margin-bottom: 10px;
 }
-/* line 245, ../sass/_totalrecall.scss */
+/* line 218, ../sass/_totalrecall.scss */
 .row:last-child {
   margin: 0;
 }
 
-/* line 252, ../sass/_totalrecall.scss */
+/* line 225, ../sass/_totalrecall.scss */
 .card {
   position: relative;
   box-sizing: border-box;
@@ -313,9 +297,34 @@ em {
   max-width: 130px;
   max-height: 200px;
   margin-right: 10px;
-  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
   cursor: pointer;
   opacity: 1;
+}
+/* line 234, ../sass/_totalrecall.scss */
+.card:last-child {
+  margin-right: 0;
+}
+/* line 12, ../sass/_bem.scss */
+.card--showing {
+  cursor: default;
+}
+/* line 12, ../sass/_bem.scss */
+.card--matched {
+  opacity: .3;
+}
+/* line 246, ../sass/_totalrecall.scss */
+.card--matched .card__face--front {
+  cursor: default;
+  color: #999;
+}
+/* line 5, ../sass/_bem.scss */
+.card__face {
+  -moz-backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
   -moz-perspective: 600px;
   -webkit-perspective: 600px;
   perspective: 600px;
@@ -330,68 +339,58 @@ em {
   -o-transition-duration: 500ms;
   -webkit-transition-duration: 500ms;
   transition-duration: 500ms;
-}
-/* line 261, ../sass/_totalrecall.scss */
-.card:last-child {
-  margin-right: 0;
-}
-/* line 12, ../sass/_bem.scss */
-.card--flipped {
-  -moz-transform: rotateY(180deg);
-  -ms-transform: rotateY(180deg);
-  -o-transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg);
-  transform: rotateY(180deg);
-}
-/* line 12, ../sass/_bem.scss */
-.card--showing {
-  cursor: default;
-}
-/* line 12, ../sass/_bem.scss */
-.card--matched {
-  opacity: .3;
-}
-/* line 285, ../sass/_totalrecall.scss */
-.card--matched .card__face--front {
-  cursor: default;
-  color: #999;
-}
-/* line 5, ../sass/_bem.scss */
-.card__face {
-  -moz-backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  border-radius: 10px;
   display: block;
   width: 100%;
   height: 100%;
   position: absolute;
   overflow: hidden;
   border: 1px solid #333;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
 }
 /* line 12, ../sass/_bem.scss */
 .card__face--back {
+  -moz-backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   background: url(../images/logo.png) center center no-repeat white;
   background-size: contain;
 }
 /* line 12, ../sass/_bem.scss */
 .card__face--front {
+  -moz-transform: rotateY(180deg);
+  -ms-transform: rotateY(180deg);
+  -o-transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  transform: rotateY(180deg);
   background: white;
+  color: #660000;
   font-family: "Lobster Two", sans-serif;
   font-weight: bold;
   font-size: 70px;
   text-align: center;
-  color: #660000;
+}
+/* line 287, ../sass/_totalrecall.scss */
+.card--flipped .card__face--back {
   -moz-transform: rotateY(180deg);
   -ms-transform: rotateY(180deg);
   -o-transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
   transform: rotateY(180deg);
 }
+/* line 290, ../sass/_totalrecall.scss */
+.no-csstransforms3d .card--flipped .card__face--back {
+  display: none;
+}
+/* line 295, ../sass/_totalrecall.scss */
+.card--flipped .card__face--front {
+  -moz-transform: rotateY(0);
+  -ms-transform: rotateY(0);
+  -o-transform: rotateY(0);
+  -webkit-transform: rotateY(0);
+  transform: rotateY(0);
+}
 
-/* line 325, ../sass/_totalrecall.scss */
+/* line 304, ../sass/_totalrecall.scss */
 .footer {
   display: table;
   width: 100%;
@@ -431,12 +430,7 @@ em {
   color: yellow;
   font-style: italic;
 }
-/* line 355, ../sass/_totalrecall.scss */
+/* line 334, ../sass/_totalrecall.scss */
 .footer__link:hover {
   color: red;
-}
-
-/* line 360, ../sass/_totalrecall.scss */
-.border {
-  border: 1px solid red !important;
 }

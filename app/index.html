@@ -51,15 +51,16 @@
                 <div class="endgame" id="endgame">
                     <h2 class="endgame__message"><em>Congratulations!</em> You won!</h2>
                     <form>
-                        <input type="submit" class="endgame__submit" value="Play Again" id="submit-again">
+                        <a href="#" class="endgame__submit" id="again">Play Again</a>
                     </form>
                 </div>
 
             </div>
 
-            <div class="gameboard" id="gameboard">
+            <div class="gameboard-wrapper">
+                <div class="gameboard" id="gameboard">
+                </div>
             </div>
-
 
             <script type="text/html" id="rowTemplate">
                 <div class="row"></div>           
@@ -75,7 +76,7 @@
         </div>
 
         <footer class="footer">
-            <h1 class="footer__title" id="solve-message"> Booo, I suck! <a href="#" class="footer__link" id="solve">Solve this game for me!</a></h1>
+            <h1 class="footer__title" id="solveMessage"> Booo, I suck! <a href="#" class="footer__link" id="solve">Solve this game for me!</a></h1>
         </footer>
 
         <!-- build:js scripts/vendor.js -->
