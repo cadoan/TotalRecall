@@ -5,8 +5,8 @@ define(['jquery'], function ($) {
 
 /* FOR PRODUCTION:  Override of console.log
 ***************************************************************/
-	// var console = {};
-	// console.log = function(){};
+var console = {};
+console.log = function(){};
 /**************************************************************/
 
 
@@ -112,7 +112,6 @@ define(['jquery'], function ($) {
 
 			var signinDetails = $game.signin.serialize();
 
-			$.support.cors = true;
 			$.ajaxSetup({ cache: false });  //IE cache busting
 			$.ajax({
 				url: options.URL,

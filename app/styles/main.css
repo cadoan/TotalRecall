@@ -112,11 +112,12 @@ em {
   font-family: "Lobster Two", sans-serif;
   font-size: 4rem;
   font-style: italic;
+  font-weight: 700;
   text-align: center;
   text-shadow: 2px 3px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* line 56, ../sass/_totalrecall.scss */
+/* line 57, ../sass/_totalrecall.scss */
 .messagebar {
   display: table;
   height: 3.5%;
@@ -133,14 +134,14 @@ em {
   text-align: center;
 }
 
-/* line 74, ../sass/_totalrecall.scss */
+/* line 75, ../sass/_totalrecall.scss */
 .middle {
   width: 100%;
   height: 80%;
   position: relative;
 }
 
-/* line 81, ../sass/_totalrecall.scss */
+/* line 82, ../sass/_totalrecall.scss */
 .dialogbox {
   position: absolute;
   z-index: 99;
@@ -154,7 +155,7 @@ em {
   -webkit-box-shadow: 0px 0px 30px rgba(255, 255, 255, 0.4);
   box-shadow: 0px 0px 30px rgba(255, 255, 255, 0.4);
 }
-/* line 92, ../sass/_totalrecall.scss */
+/* line 93, ../sass/_totalrecall.scss */
 .dialogbox > div, .dialogbox > form {
   box-sizing: border-box;
   height: 100%;
@@ -162,7 +163,7 @@ em {
   text-align: center;
 }
 
-/* line 102, ../sass/_totalrecall.scss */
+/* line 103, ../sass/_totalrecall.scss */
 .signin {
   background: #660000;
 }
@@ -174,7 +175,7 @@ em {
   text-shadow: 2px 3px 2px rgba(0, 0, 0, 0.5);
   color: white;
 }
-/* line 112, ../sass/_totalrecall.scss */
+/* line 113, ../sass/_totalrecall.scss */
 .signin__title em {
   font-size: 3rem;
 }
@@ -207,12 +208,12 @@ em {
   border: 1px solid #333;
   cursor: pointer;
 }
-/* line 142, ../sass/_totalrecall.scss */
+/* line 143, ../sass/_totalrecall.scss */
 .signin__submit:hover {
   background: #030;
 }
 
-/* line 150, ../sass/_totalrecall.scss */
+/* line 151, ../sass/_totalrecall.scss */
 .wait {
   display: none;
   vertical-align: middle;
@@ -223,7 +224,7 @@ em {
   margin: 20px 0;
 }
 
-/* line 161, ../sass/_totalrecall.scss */
+/* line 162, ../sass/_totalrecall.scss */
 .endgame {
   display: none;
   background: #660000;
@@ -234,7 +235,7 @@ em {
   font-family: "Lobster Two", sans-serif;
   font-size: 3.5rem;
 }
-/* line 170, ../sass/_totalrecall.scss */
+/* line 171, ../sass/_totalrecall.scss */
 .endgame__message em {
   color: yellow;
 }
@@ -253,19 +254,19 @@ em {
   border: 1px solid #333;
   cursor: pointer;
 }
-/* line 188, ../sass/_totalrecall.scss */
+/* line 189, ../sass/_totalrecall.scss */
 .endgame__submit:hover {
   background: #030;
 }
 
-/* line 194, ../sass/_totalrecall.scss */
+/* line 195, ../sass/_totalrecall.scss */
 .gameboard-wrapper {
   position: absolute;
   width: 100%;
   height: 100%;
 }
 
-/* line 200, ../sass/_totalrecall.scss */
+/* line 201, ../sass/_totalrecall.scss */
 .gameboard {
   display: none;
   left: 0;
@@ -279,16 +280,16 @@ em {
   text-align: center;
 }
 
-/* line 215, ../sass/_totalrecall.scss */
+/* line 216, ../sass/_totalrecall.scss */
 .row {
   margin-bottom: 10px;
 }
-/* line 218, ../sass/_totalrecall.scss */
+/* line 219, ../sass/_totalrecall.scss */
 .row:last-child {
   margin: 0;
 }
 
-/* line 225, ../sass/_totalrecall.scss */
+/* line 226, ../sass/_totalrecall.scss */
 .card {
   position: relative;
   box-sizing: border-box;
@@ -300,7 +301,7 @@ em {
   cursor: pointer;
   opacity: 1;
 }
-/* line 234, ../sass/_totalrecall.scss */
+/* line 235, ../sass/_totalrecall.scss */
 .card:last-child {
   margin-right: 0;
 }
@@ -312,7 +313,7 @@ em {
 .card--matched {
   opacity: .3;
 }
-/* line 246, ../sass/_totalrecall.scss */
+/* line 247, ../sass/_totalrecall.scss */
 .card--matched .card__face--front {
   cursor: default;
   color: #999;
@@ -369,7 +370,7 @@ em {
   font-size: 70px;
   text-align: center;
 }
-/* line 287, ../sass/_totalrecall.scss */
+/* line 288, ../sass/_totalrecall.scss */
 .card--flipped .card__face--back {
   -moz-transform: rotateY(180deg);
   -ms-transform: rotateY(180deg);
@@ -377,11 +378,11 @@ em {
   -webkit-transform: rotateY(180deg);
   transform: rotateY(180deg);
 }
-/* line 290, ../sass/_totalrecall.scss */
+/* line 291, ../sass/_totalrecall.scss */
 .no-csstransforms3d .card--flipped .card__face--back {
   display: none;
 }
-/* line 295, ../sass/_totalrecall.scss */
+/* line 296, ../sass/_totalrecall.scss */
 .card--flipped .card__face--front {
   -moz-transform: rotateY(0);
   -ms-transform: rotateY(0);
@@ -390,7 +391,7 @@ em {
   transform: rotateY(0);
 }
 
-/* line 304, ../sass/_totalrecall.scss */
+/* line 305, ../sass/_totalrecall.scss */
 .footer {
   display: table;
   width: 100%;
@@ -430,7 +431,7 @@ em {
   color: yellow;
   font-style: italic;
 }
-/* line 334, ../sass/_totalrecall.scss */
+/* line 335, ../sass/_totalrecall.scss */
 .footer__link:hover {
   color: red;
 }
